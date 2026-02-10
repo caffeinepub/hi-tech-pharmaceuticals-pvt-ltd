@@ -1,0 +1,128 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-10T09:06:08.185Z",
+  "summary": "The diff adds a Motoko backend actor with product/category/order types, public product queries, authenticated order submission/history, and a React frontend with public site routes, admin routes with an Internet Identity-based guard, product cards with an A–Z filter component, and admin CRUD UI components (at least for adding categories and editing/creating products). Several BuildRequest requirements are either not evidenced or appear incompatible with the implemented approach (notably admin email/password auth and backend persistence/timestamps).",
+  "missing_requirements": [
+    {
+      "id": "REQ-2",
+      "requirement": "Create a dedicated, separate admin login flow using admin email + password and restrict all admin functionality to authenticated admins only.",
+      "reason": "Admin access control in the diff appears to be based on Internet Identity + an is-admin check (and a secret token initializer), not an email+password login flow. No evidence of password handling, credential storage, or email/password authentication API/UI.",
+      "evidence": [
+        "frontend/src/components/admin/AdminRouteGuard.tsx",
+        "frontend/src/components/layout/AdminLayout.tsx",
+        "frontend/src/hooks/useActor.ts",
+        "frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Manage product categories in admin panel: categories can be created/edited and products assigned to categories.",
+      "reason": "Only adding categories is evidenced; no edit/delete category UI or hooks are shown in the provided diff summary. Product assignment to categories is present in the product editor, but category editing is not evidenced.",
+      "evidence": [
+        "frontend/src/pages/admin/AdminCategoriesPage.tsx",
+        "frontend/src/components/admin/ProductEditorDialog.tsx"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Admin can open an order to view customer identifier, submitted items, quantities, and submitted timestamp; orders sorted newest first.",
+      "reason": "The backend Order type shown has no submitted timestamp field, so the timestamp requirement cannot be met as implemented. Sorting newest-first also cannot be supported without a timestamp (or another ordering field).",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Header displays the exact company name “Hi-Tech Pharmaceuticals Pvt. Ltd.”.",
+      "reason": "The site header shows \"Hi-Tech Pharmaceuticals\" and \"Pvt. Ltd.\" as separate elements rather than the exact single string. The requirement asks for the exact company name text.",
+      "evidence": [
+        "frontend/src/components/layout/SiteLayout.tsx"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Footer includes “© Hi-Tech Pharmaceuticals Pvt. Ltd.” and the exact disclaimer: “For wholesale trade purposes only”.",
+      "reason": "No footer content for the public site is shown in the diff summary (SiteLayout is truncated before footer), so the required © line and exact disclaimer text are not evidenced.",
+      "evidence": [
+        "frontend/src/components/layout/SiteLayout.tsx"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Contact page displays the specified email/phone and includes a working inquiry form UI with submit confirmation.",
+      "reason": "ContactPage implementation is not shown in the diff summary, so the required contact details and inquiry form/confirmation cannot be verified from evidence provided.",
+      "evidence": [
+        "frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "requirement": "All persisted entities remain available across canister upgrades per standard stable storage practices.",
+      "reason": "The backend uses in-memory Maps (e.g., `let products = Map.empty...`) with no shown stable variables or upgrade hooks in the provided snippet, so persistence across upgrades is not evidenced.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Secret-token based access-control initialization via URL parameter `caffeineAdminToken`.",
+      "reason": "The BuildRequest specifies a separate admin login flow via email+password (REQ-2) and does not request a secret URL token mechanism for admin/access initialization.",
+      "evidence": [
+        "frontend/src/hooks/useActor.ts"
+      ]
+    },
+    {
+      "description": "User profile capture/storage (name/email) gated by user permission.",
+      "reason": "The BuildRequest does not require storing a separate user profile object; it only requires a stable customer identifier to associate orders (which could be the Principal).",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/components/auth/ProfileSetupDialog.tsx",
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    }
+  ],
+  "confidence": 0.74,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/admin/AdminRouteGuard.tsx",
+    "frontend/src/components/admin/ProductEditorDialog.tsx",
+    "frontend/src/components/admin/ProductPhotoUploader.tsx",
+    "frontend/src/components/auth/CustomerLoginButton.tsx",
+    "frontend/src/components/auth/ProfileSetupDialog.tsx",
+    "frontend/src/components/layout/AdminLayout.tsx",
+    "frontend/src/components/layout/SiteLayout.tsx",
+    "frontend/src/components/products/AZFilter.tsx",
+    "frontend/src/components/products/ProductCard.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useAuthGate.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/index.css",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/AboutPage.tsx",
+    "frontend/src/pages/CartPage.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/ContactPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/OrderHistoryPage.tsx",
+    "frontend/src/pages/ProductDetailPage.tsx",
+    "frontend/src/pages/ProductsPage.tsx",
+    "frontend/src/pages/admin/AdminCategoriesPage.tsx",
+    "frontend/src/pages/admin/AdminDashboardPage.tsx",
+    "frontend/src/pages/admin/AdminLoginPage.tsx",
+    "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
+    "frontend/src/pages/admin/AdminOrdersPage.tsx",
+    "frontend/src/pages/admin/AdminProductsPage.tsx",
+    "frontend/src/state/cartStore.ts",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

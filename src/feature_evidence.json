@@ -1,0 +1,191 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-implement-customer-authentication-that-allows-users-to-sign-in-with-a-google-account-and-require-authentication-only-when-placing-an-order-public-browsing-must-not-require-login",
+      "featureTitle": "Implement customer authentication that allows users to sign in with a Google account and require authentication only when placing an order (public browsing must not require login).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/auth/CustomerLoginButton.tsx",
+        "frontend/src/hooks/useAuthGate.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-dedicated-separate-admin-login-flow-using-admin-email-password-and-restrict-all-admin-functionality-to-authenticated-admins-only",
+      "featureTitle": "Create a dedicated, separate admin login flow using admin email + password and restrict all admin functionality to authenticated admins only.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/admin/AdminRouteGuard.tsx",
+        "frontend/src/pages/admin/AdminLoginPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-build-the-public-product-catalog-ui-with-alphabetical-a-z-sorting-and-an-a-z-letter-filter-showing-product-name-image-dosage-form-packing-details-wholesale-rate-price-and-bonus-scheme-for-each-product",
+      "featureTitle": "Build the public product catalog UI with alphabetical (A–Z) sorting and an A–Z letter filter, showing product name, image, dosage form, packing details, wholesale rate/price, and bonus scheme for each product.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/products/AZFilter.tsx",
+        "frontend/src/components/products/ProductCard.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/ProductsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-product-management-in-the-admin-panel-add-edit-delete-products-upload-update-product-photos-set-product-rate-price-add-update-bonus-offers-and-manage-product-categories",
+      "featureTitle": "Implement product management in the admin panel: add, edit, delete products; upload/update product photos; set product rate/price; add/update bonus offers; and manage product categories.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/admin/ProductEditorDialog.tsx",
+        "frontend/src/components/admin/ProductPhotoUploader.tsx",
+        "frontend/src/pages/admin/AdminCategoriesPage.tsx",
+        "frontend/src/pages/admin/AdminDashboardPage.tsx",
+        "frontend/src/pages/admin/AdminProductsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-cart-and-wholesale-order-inquiry-workflow-authenticated-customers-can-add-products-to-cart-review-an-order-summary-submit-an-order-inquiry-and-view-their-order-history",
+      "featureTitle": "Implement a cart and wholesale order/inquiry workflow: authenticated customers can add products to cart, review an order summary, submit an order/inquiry, and view their order history.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/CartPage.tsx",
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/OrderHistoryPage.tsx",
+        "frontend/src/state/cartStore.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-an-admin-facing-order-management-view-that-lists-incoming-orders-inquiries-and-their-details-serving-as-the-primary-notification-mechanism-within-the-app",
+      "featureTitle": "Provide an admin-facing order management view that lists incoming orders/inquiries and their details, serving as the primary \"notification\" mechanism within the app.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
+        "frontend/src/pages/admin/AdminOrdersPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-site-pages-and-layout-header-with-company-name-hi-tech-pharmaceuticals-pvt-ltd-and-navigation-home-about-us-products-contact-us-about-us-section-content-overview-mission-vision-commitment-contact-page-showing-email-and-phone-plus-a-contact-form-footer-with-and-disclaimer-text",
+      "featureTitle": "Create site pages and layout: header with company name “Hi-Tech Pharmaceuticals Pvt. Ltd.” and navigation (Home | About Us | Products | Contact Us); About Us section content (overview, mission & vision, commitment); Contact page showing email and phone, plus a contact form; footer with © and disclaimer text.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/SiteLayout.tsx",
+        "frontend/src/pages/AboutPage.tsx",
+        "frontend/src/pages/ContactPage.tsx",
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-the-requested-clean-modern-hi-tech-medical-design-with-a-white-blue-light-gray-color-scheme-professional-trustworthy-styling-and-full-responsiveness-across-the-customer-site-and-admin-panel",
+      "featureTitle": "Apply the requested clean, modern hi-tech medical design with a white/blue/light gray color scheme, professional/trustworthy styling, and full responsiveness across the customer site and admin panel.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AdminLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
