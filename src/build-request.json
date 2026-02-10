@@ -1,77 +1,89 @@
 {
   "kind": "build_request",
-  "title": "Show customer/orderer details for each order in the admin panel",
+  "title": "Add product quantity selector and replace Home \"Why Choose Us\" with \"Hot Products\" list",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-13",
-      "text": "Add an admin-session-protected backend query that returns the customer (orderer) details for a given order, including the customer Principal and the saved UserProfile (name, email) if available.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "1.please add function of showing custmber/orderer detail in admin panel"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When called by an authenticated admin session, the new query returns customer/orderer details for the specified order ID.",
-        "If the order ID does not exist, the backend returns a clear error (trap) consistent with existing patterns (e.g., \"Order does not exist\").",
-        "If the customer has not saved a user profile yet, the query still returns the customer Principal and indicates that the profile is missing (e.g., null/empty optional).",
-        "When called without an active admin session, the query is rejected with \"Unauthorized: Admin session required\" (or equivalent existing message)."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Update the admin orders data flow so the frontend can display customer/orderer details (name, email, and principal) in the admin panel orders list and order detail views using backend data (not hardcoded).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "1.please add function of showing custmber/orderer detail in admin panel"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The frontend has a React Query hook to fetch the customer/orderer details needed by the admin UI (either per-order or as part of an enriched admin orders query).",
-        "The implementation does not rely on AccessControl.isAdmin checks for admin panel access; it uses the existing admin session authorization model (requireAdminSession).",
-        "No changes are made to the customer login flow (Internet Identity) or to public browsing behavior."
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "text": "Enhance the admin UI to show customer/orderer details for each order: (1) in the Admin Orders list, show customer name/email when available (fallback to showing the principal), and (2) in the Admin Order Detail page, show a dedicated \"Customer Details\" section with name, email, and principal (with clear \"Not provided\" fallbacks).",
+      "id": "REQ-16",
+      "text": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8"
+          "msg-5"
         ],
         "quotes": [
-          "1.please add function of showing custmber/orderer detail in admin panel"
+          "2. aslo add quantity option in product"
         ]
       },
       "acceptanceCriteria": [
-        "AdminOrdersPage shows customer/orderer info beyond the truncated principal (at minimum name and/or email when available; otherwise shows principal).",
-        "AdminOrderDetailPage includes a \"Customer Details\" section that displays: Name, Email, and Customer Principal.",
-        "If profile data is not available for an order, the UI displays \"Not provided\" (in English) for missing fields without crashing.",
-        "All customer/orderer details are only visible behind existing admin route protection (AdminRouteGuard / admin session)."
+        "On ProductsPage, each ProductCard provides a quantity control (e.g., stepper or numeric input) with a default quantity of 1.",
+        "On ProductDetailPage, the page provides a quantity control with a default quantity of 1.",
+        "Clicking “Add to Cart” uses the selected quantity (not always +1).",
+        "Quantity is validated client-side to be an integer >= 1; invalid values are prevented or corrected to 1.",
+        "The existing cart page quantity controls continue to work as-is for adjusting quantities after items are in the cart."
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "text": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "2. aslo add quantity option in product"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The cart store addItem action supports specifying a quantity when adding a product.",
+        "If a product already exists in the cart, adding with quantity N increases its quantity by N (rather than always +1).",
+        "Checkout submission still sends the final cart quantities to the backend unchanged (i.e., quantities reflect the selected quantity plus any later cart edits).",
+        "No TypeScript errors remain in pages/components that call addItem (e.g., ProductsPage, ProductDetailPage)."
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "3. also replace the part of why choosing us to hot product and keep list of product list there"
+        ]
+      },
+      "acceptanceCriteria": [
+        "HomePage no longer renders the “Why Choose Us” feature grid.",
+        "HomePage renders a section titled “Hot Products”.",
+        "The “Hot Products” section fetches products using the existing frontend data hooks and renders a product list/grid (reusing existing product UI where practical).",
+        "Each listed product links to its Product Detail page and provides a clear path to view all products (e.g., a “View All Products” link/button).",
+        "If products are still loading or empty, the section shows an appropriate loading/empty state message in English."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
-    "Do not edit any frontend files under frontend/src/components/ui (Shadcn components are read-only).",
-    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT (compose new hooks/utilities or update non-immutable files instead)."
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui (compose these components instead).",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add migration.mo if a stable state upgrade is required (not expected for these UI/cart changes)."
   ],
   "nonGoals": [
-    "Adding new customer profile fields beyond the existing name and email (e.g., address, phone) unless explicitly requested.",
-    "Adding email/SMS notifications for new orders.",
-    "Changing the order submission workflow, order ID generation, or existing status options beyond what is required to display customer details."
+    "Do not change the backend Product, Order, or OrderItem schema.",
+    "Do not implement a new admin feature for marking products as “hot” (the Home “Hot Products” list can be derived from existing product data, e.g., showing a subset).",
+    "Do not add third-party services, analytics, or external databases."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

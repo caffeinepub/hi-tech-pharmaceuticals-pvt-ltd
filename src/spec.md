@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Allow admins to view customer/orderer details (principal, name, email when available) for each order in the admin panel.
+**Goal:** Let shoppers select a quantity before adding products to the cart, and update the Home page to feature a “Hot Products” product list instead of the “Why Choose Us” section.
 
 **Planned changes:**
-- Add an admin-session-protected backend query to fetch customer/orderer details for a specified order ID, returning the customer Principal and optional saved UserProfile (name, email) when available.
-- Update the admin orders frontend data flow (React Query) to fetch and use backend-provided customer/orderer details under the existing admin session authorization model.
-- Enhance the admin UI to display customer/orderer details in the Admin Orders list (name/email fallback to principal) and add a "Customer Details" section on the Admin Order Detail page with "Not provided" fallbacks.
+- Add a quantity control (default 1) to product surfaces on the Products listing cards and the Product Detail page, validating to an integer ≥ 1 and using the selected quantity when adding to cart.
+- Update the cart store add-item API to accept an explicit quantity and to increment existing cart line quantities by the added amount, without breaking checkout/order submission.
+- Replace the Home page “Why Choose Us” section with a “Hot Products” section that fetches products via existing hooks, renders a product list/grid, links to product details, and provides a “View All Products” path with loading/empty states.
 
-**User-visible outcome:** In the admin panel, admins can see who placed each order (name/email when available, otherwise principal) in both the orders list and the order detail view, visible only to authenticated admin sessions.
+**User-visible outcome:** Customers can choose how many items to add to the cart from product cards and product details, and the Home page shows a “Hot Products” product list instead of the prior feature grid.

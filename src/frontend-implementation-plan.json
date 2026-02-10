@@ -1,43 +1,88 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin orders: display customer/orderer details (name, email, principal)",
+  "title": "Quantity selector on product surfaces + Home Hot Products section",
   "requirements": [
     {
-      "id": "REQ-14",
-      "summary": "Add React Query data flow for admin to fetch per-order customer/orderer details from the backend and consume it in admin views using the existing admin session authorization model.",
+      "id": "REQ-16",
+      "summary": "Add a quantity selector (default 1, integer >= 1) to Products listing cards and Product Detail page, and use it when adding to cart.",
       "acceptanceCriteria": [
-        "The frontend has a React Query hook to fetch the customer/orderer details needed by the admin UI (either per-order or as part of an enriched admin orders query).",
-        "The implementation does not rely on AccessControl.isAdmin checks for admin panel access; it uses the existing admin session authorization model (requireAdminSession).",
-        "No changes are made to the customer login flow (Internet Identity) or to public browsing behavior."
+        "On ProductsPage, each ProductCard provides a quantity control (e.g., stepper or numeric input) with a default quantity of 1.",
+        "On ProductDetailPage, the page provides a quantity control with a default quantity of 1.",
+        "Clicking “Add to Cart” uses the selected quantity (not always +1).",
+        "Quantity is validated client-side to be an integer >= 1; invalid values are prevented or corrected to 1.",
+        "The existing cart page quantity controls continue to work as-is for adjusting quantities after items are in the cart."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/components/products/QuantitySelector.tsx",
+          "operation": "create",
+          "description": "Create a reusable quantity selector (stepper +/- and/or numeric input) that enforces integer values >= 1 (defaults to 1) and exposes onChange(quantity: number). Compose existing shadcn/ui components (e.g., Button/Input) rather than editing frontend/src/components/ui. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/products/ProductCard.tsx",
           "operation": "modify",
-          "description": "Add a new React Query hook (e.g., useGetOrderCustomerDetails(orderId)) that calls the backend capability getOrderCustomerDetails and returns customer principal plus optional UserProfile (name/email). Ensure the query is actor-dependent, disabled when actor/orderId are missing, and uses retry=false to surface admin-session authorization failures cleanly. Verify the component's usage instructions before implementing."
+          "description": "Add an inline quantity selector to each card with default 1, local state, and client-side validation/clamping to integer >= 1. Update the add-to-cart callback signature to pass the chosen quantity (e.g., onAddToCart(product, quantity)). Reuse the new QuantitySelector component. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/ProductsPage.tsx",
+          "operation": "modify",
+          "description": "Update ProductsPage to accept quantity from ProductCard and pass it through the authenticated add-to-cart flow; ensure invalid quantities are corrected to 1 before calling the cart store. Keep existing cart page quantity controls unchanged. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/ProductDetailPage.tsx",
+          "operation": "modify",
+          "description": "Add a quantity selector (default 1) to ProductDetailPage and ensure “Add to Cart” uses the selected quantity with integer >= 1 validation/clamping. Reuse QuantitySelector for consistent UX. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-15",
-      "summary": "Enhance admin orders list and order detail UI to show customer/orderer name/email (when available) with principal fallback and a dedicated Customer Details section in the order detail page.",
+      "id": "REQ-17",
+      "summary": "Make cart store addItem quantity-aware and update add-to-cart call sites to use explicit quantities without breaking checkout submission.",
       "acceptanceCriteria": [
-        "AdminOrdersPage shows customer/orderer info beyond the truncated principal (at minimum name and/or email when available; otherwise shows principal).",
-        "AdminOrderDetailPage includes a \"Customer Details\" section that displays: Name, Email, and Customer Principal.",
-        "If profile data is not available for an order, the UI displays \"Not provided\" (in English) for missing fields without crashing.",
-        "All customer/orderer details are only visible behind existing admin route protection (AdminRouteGuard / admin session)."
+        "The cart store addItem action supports specifying a quantity when adding a product.",
+        "If a product already exists in the cart, adding with quantity N increases its quantity by N (rather than always +1).",
+        "Checkout submission still sends the final cart quantities to the backend unchanged (i.e., quantities reflect the selected quantity plus any later cart edits).",
+        "No TypeScript errors remain in pages/components that call addItem (e.g., ProductsPage, ProductDetailPage)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/admin/AdminOrdersPage.tsx",
+          "path": "frontend/src/state/cartStore.ts",
           "operation": "modify",
-          "description": "Update the orders list to render customer/orderer details fetched via the new hook. Because hooks cannot be called inside a map, introduce a small per-row child component (defined in-file or imported) that accepts orderId and falls back to showing the order's customer principal while loading/error. Display name and/or email when available; otherwise show the principal (truncated). Verify the component's usage instructions before implementing."
+          "description": "Update the Zustand cart store addItem API to accept an explicit quantity (e.g., addItem(item, quantity) or addItem({..., quantity})) while preserving persisted shape for CartItem. Ensure adding an existing product increments by the passed quantity, and new items use the passed quantity (default to 1 when omitted). Include client-side guards to coerce invalid/NaN/<=0 to 1."
         },
         {
-          "path": "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
+          "path": "frontend/src/pages/ProductsPage.tsx",
           "operation": "modify",
-          "description": "Add a \"Customer Details\" section that uses the new hook to fetch and display Name, Email, and Customer Principal for the selected order. Use clear \"Not provided\" fallbacks when profile or fields are missing, and keep the existing principal display consistent with backend-returned principal. Ensure errors (including unauthorized) do not crash the page. Verify the component's usage instructions before implementing."
+          "description": "Update addItem calls to pass the selected quantity and satisfy updated TypeScript types; ensure toast messaging remains correct."
+        },
+        {
+          "path": "frontend/src/pages/ProductDetailPage.tsx",
+          "operation": "modify",
+          "description": "Update addItem calls to pass the selected quantity and satisfy updated TypeScript types."
+        },
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Verify checkout submission continues to map cart item.quantity into submitted order items unchanged; adjust only if needed to satisfy updated cart store typings (no behavioral change intended)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "summary": "Replace Home “Why Choose Us” section with a “Hot Products” section that lists products from existing queries and links to product details and all products.",
+      "acceptanceCriteria": [
+        "HomePage no longer renders the “Why Choose Us” feature grid.",
+        "HomePage renders a section titled “Hot Products”.",
+        "The “Hot Products” section fetches products using the existing frontend data hooks and renders a product list/grid (reusing existing product UI where practical).",
+        "Each listed product links to its Product Detail page and provides a clear path to view all products (e.g., a “View All Products” link/button).",
+        "If products are still loading or empty, the section shows an appropriate loading/empty state message in English."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Remove the “Why Choose Us” feature grid section and replace it with a “Hot Products” section. Use existing data hooks (useGetAllProducts) to fetch products, show English loading/empty states, and render a subset (derived list) in a grid reusing ProductCard where practical. Include a clear “View All Products” link/button to /products, and ensure each product links to its detail route (via ProductCard). Verify the component's usage instructions before implementing."
         }
       ]
     }

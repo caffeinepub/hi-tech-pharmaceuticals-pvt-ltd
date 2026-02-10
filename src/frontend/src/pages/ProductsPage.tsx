@@ -32,18 +32,21 @@ export default function ProductsPage() {
     return filtered.sort((a, b) => a.name.localeCompare(b.name));
   }, [products, selectedLetter]);
 
-  const handleAddToCart = (product: Product) => {
+  const handleAddToCart = (product: Product, quantity: number) => {
     requireCustomerAuth(() => {
       if (showProfileSetup) {
         toast.error('Please complete your profile first');
         return;
       }
-      addToCart({
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-      });
-      toast.success(`${product.name} added to cart`);
+      addToCart(
+        {
+          productId: product.id,
+          productName: product.name,
+          price: product.price,
+        },
+        quantity
+      );
+      toast.success(`${product.name} (×${quantity}) added to cart`);
     });
   };
 

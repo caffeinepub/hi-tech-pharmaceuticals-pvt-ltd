@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useGetProduct } from '../hooks/useQueries';
 import { useAuthGate } from '../hooks/useAuthGate';
@@ -8,6 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { ShoppingCart, ArrowLeft, Package, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import QuantitySelector from '../components/products/QuantitySelector';
 
 export default function ProductDetailPage() {
   const { productId } = useParams({ from: '/products/$productId' });
@@ -15,16 +17,20 @@ export default function ProductDetailPage() {
   const { data: product, isLoading } = useGetProduct(productId);
   const { requireCustomerAuth } = useAuthGate();
   const addToCart = useCartStore((state) => state.addItem);
+  const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
     if (!product) return;
     requireCustomerAuth(() => {
-      addToCart({
-        productId: product.id,
-        productName: product.name,
-        price: product.price,
-      });
-      toast.success(`${product.name} added to cart`);
+      addToCart(
+        {
+          productId: product.id,
+          productName: product.name,
+          price: product.price,
+        },
+        quantity
+      );
+      toast.success(`${product.name} (×${quantity}) added to cart`);
     });
   };
 
@@ -94,6 +100,11 @@ export default function ProductDetailPage() {
                     <p className="text-lg">🎁 {product.bonusOffer}</p>
                   </div>
                 )}
+
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-sm font-medium">Quantity:</span>
+                  <QuantitySelector quantity={quantity} onChange={setQuantity} />
+                </div>
 
                 <Button size="lg" className="w-full" onClick={handleAddToCart}>
                   <ShoppingCart className="h-5 w-5 mr-2" />

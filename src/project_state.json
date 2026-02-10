@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 9,
   "summary": "Professional, secure, scalable wholesale pharmaceutical website for Hi-Tech Pharmaceuticals Pvt. Ltd. with public A–Z product catalog, login required only for ordering using Google authentication, cart and wholesale order workflow, customer order history, and a separate secure admin panel for product/price/bonus/image management, plus About and Contact sections.",
   "architectural_notes": [
     "Authentication requirement: use Google login for customers; admin uses separate email+password login.",
@@ -109,6 +109,30 @@
         "REQ-15"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-quantity-selector-option-on-product-surfaces-so-customers-can-choose-a-quantity-before-adding-a-product-to-the-cart-including-on-the-products-listing-cards-and-the-product-detail-page",
+      "title": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-cart-state-api-to-support-adding-items-with-an-explicit-quantity-and-ensure-existing-add-to-cart-flows-use-the-new-quantity-aware-behavior-without-breaking-checkout-order-submission",
+      "title": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-the-home-page-why-choose-us-section-with-a-hot-products-section-that-displays-a-list-of-products-fetched-from-the-existing-products-query",
+      "title": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -176,6 +200,18 @@
       "reqIds": [
         "REQ-13"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Add a quantity selector/option for products so customers can choose quantities (e.g., in product listing/details and/or when adding to cart)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Homepage content update: replace the \"Why Choosing Us\" section with a \"Hot Product\" section that displays a list of products",
+      "reqIds": [],
       "status": "pending"
     }
   ],

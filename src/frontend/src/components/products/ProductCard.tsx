@@ -1,18 +1,25 @@
+import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart, Package } from 'lucide-react';
+import QuantitySelector from './QuantitySelector';
 import type { Product } from '../../backend';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
+  onAddToCart: (product: Product, quantity: number) => void;
 }
 
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
+  const [quantity, setQuantity] = useState(1);
   const imageUrl = product.photo?.getDirectURL();
   const priceDisplay = Number(product.price).toLocaleString();
+
+  const handleAddToCart = () => {
+    onAddToCart(product, quantity);
+  };
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -51,8 +58,12 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
           </div>
         )}
       </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button className="w-full" onClick={() => onAddToCart(product)}>
+      <CardFooter className="p-4 pt-0 flex flex-col gap-3">
+        <div className="flex items-center justify-between w-full">
+          <span className="text-sm text-muted-foreground">Quantity:</span>
+          <QuantitySelector quantity={quantity} onChange={setQuantity} />
+        </div>
+        <Button className="w-full" onClick={handleAddToCart}>
           <ShoppingCart className="h-4 w-4 mr-2" />
           Add to Cart
         </Button>

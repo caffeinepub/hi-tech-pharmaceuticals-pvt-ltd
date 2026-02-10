@@ -46,76 +46,96 @@ export default function CheckoutPage() {
       clearCart();
       toast.success('Order submitted successfully!');
     } catch (error) {
-      toast.error('Failed to submit order');
-      console.error(error);
+      toast.error('Failed to submit order. Please try again.');
+      console.error('Order submission error:', error);
     }
   };
 
   if (orderSubmitted) {
     return (
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto text-center">
-          <CheckCircle className="h-16 w-16 mx-auto mb-4 text-green-500" />
-          <h1 className="text-3xl font-bold mb-2">Order Submitted Successfully!</h1>
-          <p className="text-muted-foreground mb-6">
-            Thank you for your order. We will process it shortly and contact you for confirmation.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button onClick={() => navigate({ to: '/products' })}>Continue Shopping</Button>
-            <Button variant="outline" onClick={() => navigate({ to: '/orders' })}>
-              View Order History
-            </Button>
-          </div>
-        </div>
+        <Card className="max-w-2xl mx-auto text-center">
+          <CardContent className="p-12">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Order Submitted Successfully!</h2>
+            <p className="text-muted-foreground mb-6">
+              Your order has been received and is being processed. You can track your order status
+              in your order history.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => navigate({ to: '/orders' })}>View Order History</Button>
+              <Button variant="outline" onClick={() => navigate({ to: '/products' })}>
+                Continue Shopping
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   if (items.length === 0) {
-    navigate({ to: '/cart' });
-    return null;
+    return (
+      <div className="container mx-auto px-4 py-12">
+        <Card className="max-w-2xl mx-auto text-center">
+          <CardContent className="p-12">
+            <p className="text-muted-foreground mb-4">Your cart is empty</p>
+            <Button onClick={() => navigate({ to: '/products' })}>Browse Products</Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
     <>
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">Checkout</h1>
+        <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Order Items */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>Order Items</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {items.map((item) => (
-                  <div key={item.productId} className="flex justify-between items-center">
-                    <div>
-                      <p className="font-medium">{item.productName}</p>
-                      <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+              <CardContent>
+                <div className="space-y-4">
+                  {items.map((item) => (
+                    <div key={item.productId}>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <h3 className="font-medium">{item.productName}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            NPR {Number(item.price).toLocaleString()} × {item.quantity}
+                          </p>
+                        </div>
+                        <p className="font-semibold">
+                          NPR {(Number(item.price) * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
+                      <Separator className="mt-4" />
                     </div>
-                    <p className="font-semibold">
-                      NPR {(Number(item.price) * item.quantity).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
             {userProfile && (
-              <Card className="mt-6">
+              <Card>
                 <CardHeader>
                   <CardTitle>Customer Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-2">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Name</p>
-                    <p className="font-medium">{userProfile.name}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">{userProfile.email}</p>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Name</p>
+                      <p className="font-medium">{userProfile.name}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Email</p>
+                      <p className="font-medium">{userProfile.email}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -124,7 +144,7 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div>
-            <Card className="sticky top-20">
+            <Card className="sticky top-4">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
@@ -137,7 +157,7 @@ export default function CheckoutPage() {
                   <Separator />
                   <div className="flex justify-between">
                     <span className="font-semibold">Total Amount</span>
-                    <span className="text-2xl font-bold text-primary">NPR {totalAmount.toLocaleString()}</span>
+                    <span className="font-bold text-lg">NPR {totalAmount.toLocaleString()}</span>
                   </div>
                 </div>
 
@@ -158,7 +178,7 @@ export default function CheckoutPage() {
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center">
-                  By submitting this order, you agree to our terms and conditions for wholesale trade.
+                  By submitting this order, you agree to our terms and conditions
                 </p>
               </CardContent>
             </Card>

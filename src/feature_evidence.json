@@ -2,10 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-admin-orders-data-flow-so-the-frontend-can-display-customer-orderer-details-name-email-and-principal-in-the-admin-panel-orders-list-and-order-detail-views-using-backend-data-not-hardcoded",
-      "featureTitle": "Update the admin orders data flow so the frontend can display customer/orderer details (name, email, and principal) in the admin panel orders list and order detail views using backend data (not hardcoded).",
+      "featureId": "feature-add-a-quantity-selector-option-on-product-surfaces-so-customers-can-choose-a-quantity-before-adding-a-product-to-the-cart-including-on-the-products-listing-cards-and-the-product-detail-page",
+      "featureTitle": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
       "files": [
-        "frontend/src/hooks/useQueries.ts"
+        "frontend/src/components/products/ProductCard.tsx",
+        "frontend/src/components/products/QuantitySelector.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/ProductsPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,16 +20,18 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-14"
+        "REQ-16"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-enhance-the-admin-ui-to-show-customer-orderer-details-for-each-order-1-in-the-admin-orders-list-show-customer-name-email-when-available-fallback-to-showing-the-principal-and-2-in-the-admin-order-detail-page-show-a-dedicated-customer-details-section-with-name-email-and-principal-with-clear-not-provided-fallbacks",
-      "featureTitle": "Enhance the admin UI to show customer/orderer details for each order: (1) in the Admin Orders list, show customer name/email when available (fallback to showing the principal), and (2) in the Admin Order Detail page, show a dedicated \"Customer Details\" section with name, email, and principal (with clear \"Not provided\" fallbacks).",
+      "featureId": "feature-update-the-cart-state-api-to-support-adding-items-with-an-explicit-quantity-and-ensure-existing-add-to-cart-flows-use-the-new-quantity-aware-behavior-without-breaking-checkout-order-submission",
+      "featureTitle": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
       "files": [
-        "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
-        "frontend/src/pages/admin/AdminOrdersPage.tsx"
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/ProductsPage.tsx",
+        "frontend/src/state/cartStore.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -38,7 +43,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-15"
+        "REQ-17"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-replace-the-home-page-why-choose-us-section-with-a-hot-products-section-that-displays-a-list-of-products-fetched-from-the-existing-products-query",
+      "featureTitle": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
+      "files": [
+        "frontend/src/pages/HomePage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
       ],
       "confidence": "high"
     }

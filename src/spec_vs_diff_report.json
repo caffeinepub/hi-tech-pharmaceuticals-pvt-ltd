@@ -1,36 +1,29 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T10:16:03.387Z",
-  "summary": "Frontend admin UI was updated to fetch and display per-order customer/orderer details via a new hook (useGetOrderCustomerDetails) in both the orders list and order detail page, including \"Not provided\" fallbacks. Backend changes show admin session helpers and profile queries, but the required new admin-session-protected backend query for order customer details is not visible in the provided (truncated) backend diff, so REQ-13 cannot be confirmed implemented from the evidence shown.",
+  "generatedAt": "2026-02-10T10:25:16.248Z",
+  "summary": "Diff implements a reusable QuantitySelector component, wires quantity selection into ProductCard (used on ProductsPage and HomePage) and ProductDetailPage, updates cartStore.addItem to accept an explicit quantity and accumulate quantities for existing items, and adds a HomePage “Hot Products” section derived from the existing products query. One acceptance criterion (removal of the old “Why Choose Us” grid) cannot be fully verified due to truncation of HomePage.tsx in the diff summary.",
   "missing_requirements": [
     {
-      "id": "REQ-13",
-      "requirement": "Add an admin-session-protected backend query that returns the customer (orderer) details for a given order, including the customer Principal and the saved UserProfile (name, email) if available; traps on missing order; rejects without admin session.",
-      "reason": "The frontend calls a hook named useGetOrderCustomerDetails and expects an object with { principal, profile }, but the backend diff excerpt does not show any new query method that accepts an orderId and returns these details with requireAdminSession enforcement and the specified trap messages. Because backend/main.mo is truncated, this may exist outside the excerpt; however it is not evidenced in the provided diff summary.",
+      "id": "REQ-18",
+      "requirement": "HomePage no longer renders the “Why Choose Us” feature grid.",
+      "reason": "HomePage.tsx is truncated in the diff summary; while a “Hot Products” section is shown, the evidence does not conclusively show the old “Why Choose Us” section was removed.",
       "evidence": [
-        "backend/main.mo (truncated excerpt shows requireAdminSession/hasAdminSession and profile getters, but no order-customer-details query is shown)",
-        "frontend/src/pages/admin/AdminOrderDetailPage.tsx (uses useGetOrderCustomerDetails(orderId) and reads customerDetails.profile?.name/email and customerDetails.principal)",
-        "frontend/src/pages/admin/AdminOrdersPage.tsx (uses useGetOrderCustomerDetails(order.id) and reads data.profile and data.principal)"
+        "frontend/src/pages/HomePage.tsx (truncated)"
       ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "Added/expanded a generic getUserProfile(user: Principal) query that allows access when caller is the same user OR AccessControl.isAdmin OR hasAdminSession.",
-      "reason": "The BuildRequest focuses on returning customer/orderer details for an order in the admin panel; a standalone profile lookup API is not requested and could broaden access patterns beyond what was specified.",
-      "evidence": [
-        "backend/main.mo (public query func getUserProfile(user : Principal) with AccessControl.isAdmin(...) and hasAdminSession(caller))"
-      ]
-    }
-  ],
-  "confidence": 0.56,
+  "hallucinated_features": [],
+  "confidence": 0.72,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
-    "frontend/src/pages/admin/AdminOrdersPage.tsx",
+    "frontend/src/components/products/ProductCard.tsx",
+    "frontend/src/components/products/QuantitySelector.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/ProductDetailPage.tsx",
+    "frontend/src/pages/ProductsPage.tsx",
+    "frontend/src/state/cartStore.ts",
     "project_state.json"
   ]
 }
