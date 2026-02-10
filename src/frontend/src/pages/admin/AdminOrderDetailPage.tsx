@@ -1,11 +1,11 @@
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { useGetAllOrders, useUpdateOrderStatus } from '../../hooks/useQueries';
+import { useGetAllOrders, useUpdateOrderStatus, useGetOrderCustomerDetails } from '../../hooks/useQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, User } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -13,6 +13,7 @@ export default function AdminOrderDetailPage() {
   const { orderId } = useParams({ from: '/admin/orders/$orderId' });
   const navigate = useNavigate();
   const { data: orders = [], isLoading } = useGetAllOrders();
+  const { data: customerDetails, isLoading: customerLoading } = useGetOrderCustomerDetails(orderId);
   const updateStatus = useUpdateOrderStatus();
   const [newStatus, setNewStatus] = useState('');
 
@@ -66,8 +67,46 @@ export default function AdminOrderDetailPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Customer Principal</p>
-                <p className="font-mono text-sm break-all">{order.customer.toString()}</p>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Customer Details
+                </h3>
+                {customerLoading ? (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm">Loading customer details...</span>
+                  </div>
+                ) : customerDetails ? (
+                  <div className="space-y-2 bg-muted p-4 rounded-lg">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Name</p>
+                      <p className="font-medium">{customerDetails.profile?.name || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <p className="font-medium">{customerDetails.profile?.email || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Customer Principal</p>
+                      <p className="font-mono text-xs break-all">{customerDetails.principal.toString()}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2 bg-muted p-4 rounded-lg">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Name</p>
+                      <p className="font-medium">Not provided</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Email</p>
+                      <p className="font-medium">Not provided</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Customer Principal</p>
+                      <p className="font-mono text-xs break-all">{order.customer.toString()}</p>
+                    </div>
+                  </div>
+                )}
               </div>
               <Separator />
               <div>

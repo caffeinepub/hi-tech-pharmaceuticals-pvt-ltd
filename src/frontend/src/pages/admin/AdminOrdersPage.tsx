@@ -1,9 +1,33 @@
 import { Link } from '@tanstack/react-router';
-import { useGetAllOrders } from '../../hooks/useQueries';
+import { useGetAllOrders, useGetOrderCustomerDetails } from '../../hooks/useQueries';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, ShoppingBag, Eye } from 'lucide-react';
+import type { Order } from '../../backend';
+
+function OrderCustomerInfo({ orderId }: { orderId: string }) {
+  const { data, isLoading, isError } = useGetOrderCustomerDetails(orderId);
+
+  if (isLoading) {
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
+  }
+
+  if (isError || !data) {
+    return <p className="font-mono text-xs">{orderId.slice(0, 20)}...</p>;
+  }
+
+  if (data.profile) {
+    return (
+      <div>
+        <p className="font-medium">{data.profile.name}</p>
+        <p className="text-xs text-muted-foreground">{data.profile.email}</p>
+      </div>
+    );
+  }
+
+  return <p className="font-mono text-xs">{data.principal.toString().slice(0, 20)}...</p>;
+}
 
 export default function AdminOrdersPage() {
   const { data: orders = [], isLoading } = useGetAllOrders();
@@ -54,7 +78,7 @@ export default function AdminOrdersPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Customer</p>
-                    <p className="font-mono text-xs">{order.customer.toString().slice(0, 20)}...</p>
+                    <OrderCustomerInfo orderId={order.id} />
                   </div>
                   <div>
                     <p className="text-muted-foreground">Items</p>

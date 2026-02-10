@@ -1,278 +1,43 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Hi-Tech Pharmaceuticals wholesale catalog with customer ordering and admin panel (frontend)",
+  "title": "Admin orders: display customer/orderer details (name, email, principal)",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Customer authentication via Internet Identity (Google sign-in where supported) and require login only for cart/checkout actions while keeping public browsing open.",
+      "id": "REQ-14",
+      "summary": "Add React Query data flow for admin to fetch per-order customer/orderer details from the backend and consume it in admin views using the existing admin session authorization model.",
       "acceptanceCriteria": [
-        "Unauthenticated visitors can view the full product catalog and product detail information without being redirected to login.",
-        "Attempting to add to cart and/or submit an order triggers a sign-in flow.",
-        "After successful sign-in, the user is returned to the intended action (e.g., cart/checkout) without losing selected items.",
-        "The app stores a stable customer identifier to associate orders with the signed-in customer."
+        "The frontend has a React Query hook to fetch the customer/orderer details needed by the admin UI (either per-order or as part of an enriched admin orders query).",
+        "The implementation does not rely on AccessControl.isAdmin checks for admin panel access; it uses the existing admin session authorization model (requireAdminSession).",
+        "No changes are made to the customer login flow (Internet Identity) or to public browsing behavior."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "create",
-          "description": "Create the app shell and routing (public pages + protected customer flows). Add guarded navigation so catalog browsing is public, while cart/checkout triggers Internet Identity sign-in and then returns to the intended route/action."
-        },
-        {
-          "path": "frontend/src/hooks/useAuthGate.ts",
-          "operation": "create",
-          "description": "Add a small helper hook to (1) detect authenticated vs guest via useInternetIdentity, (2) persist an intended route/action for post-login redirect, and (3) expose a single 'requireCustomerAuth()' function used by add-to-cart / checkout."
-        },
-        {
-          "path": "frontend/src/hooks/useCustomerProfile.ts",
-          "operation": "create",
-          "description": "Use the selected authorization component’s frontend flow (getCallerUserProfile/saveCallerUserProfile) to ensure first-time customers set a human-readable profile; persist a stable customer identifier by using the Internet Identity principal as the core identifier. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/auth/CustomerLoginButton.tsx",
-          "operation": "create",
-          "description": "Create a customer login/logout button using the selected authorization component guidance with useInternetIdentity, and clear cached app data (React Query cache + local state as appropriate) on logout. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Separate admin login UI (email + password) and admin-only route protection distinct from customer authentication.",
-      "acceptanceCriteria": [
-        "Admin routes/pages are not accessible unless the user is authenticated as an admin.",
-        "Admin authentication is distinct from customer authentication and does not grant customer accounts admin capabilities.",
-        "An admin can log out and is then prevented from accessing admin pages until logging in again."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/admin/AdminLoginPage.tsx",
-          "operation": "create",
-          "description": "Create a dedicated admin login page with email + password form that calls the backend capability for admin authentication/role assignment and shows clear success/failure states (no impact on public browsing)."
-        },
-        {
-          "path": "frontend/src/components/admin/AdminRouteGuard.tsx",
-          "operation": "create",
-          "description": "Implement an admin-only guard that checks the current caller role (e.g., via backend getCallerUserRole/isCallerAdmin) and blocks access to all admin routes unless authenticated as admin; show an access denied / redirect to admin login."
-        },
-        {
-          "path": "frontend/src/components/admin/AdminLogoutButton.tsx",
-          "operation": "create",
-          "description": "Add an admin logout control that clears any admin session state stored on the frontend and forces a role re-check; ensure admin pages are no longer accessible after logout."
-        },
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Wire the admin login page and all admin routes into the router, wrapping admin pages with AdminRouteGuard and ensuring admin navigation is not shown to non-admins."
+          "description": "Add a new React Query hook (e.g., useGetOrderCustomerDetails(orderId)) that calls the backend capability getOrderCustomerDetails and returns customer principal plus optional UserProfile (name/email). Ensure the query is actor-dependent, disabled when actor/orderId are missing, and uses retry=false to surface admin-session authorization failures cleanly. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Public product catalog UI with A–Z sorting, A–Z letter filter, and product cards showing required fields.",
+      "id": "REQ-15",
+      "summary": "Enhance admin orders list and order detail UI to show customer/orderer name/email (when available) with principal fallback and a dedicated Customer Details section in the order detail page.",
       "acceptanceCriteria": [
-        "Product list is sorted A–Z by product name by default.",
-        "Selecting a letter filter shows only products whose names begin with that letter; there is also an option to clear the filter.",
-        "Each product card/list row visibly includes all requested fields (name, image, dosage form, packing, price, bonus scheme).",
-        "UI is responsive and usable on mobile and desktop."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/ProductsPage.tsx",
-          "operation": "create",
-          "description": "Implement the public Products page that fetches products via the backend interface (getAllProducts), sorts by name A–Z by default, and applies an A–Z letter filter with a clear option."
-        },
-        {
-          "path": "frontend/src/components/products/AZFilter.tsx",
-          "operation": "create",
-          "description": "Create an A–Z filter UI component that emits selected letter/null; keep it keyboard-accessible and responsive (wrap/scroll on mobile)."
-        },
-        {
-          "path": "frontend/src/components/products/ProductCard.tsx",
-          "operation": "create",
-          "description": "Create a product card/list row that displays: product name, image, dosage form, packing details, wholesale rate/price, and bonus scheme. Use the selected blob-storage component’s ExternalBlob.getDirectURL() for image rendering when photo is present. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/ProductDetailPage.tsx",
-          "operation": "create",
-          "description": "Create a product detail page that fetches a single product (getProduct) and shows the same required fields in a detail layout; include an Add to cart action that triggers customer auth gating."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Register routes/navigation for Products list and Product detail pages so they are reachable from the header nav."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Admin product/category management UI (add/edit/delete products, upload/update photos, set price, manage bonus offer, manage categories).",
-      "acceptanceCriteria": [
-        "Admin can create a new product with all required fields and it appears in the public catalog.",
-        "Admin can update an existing product (including image) and changes reflect in the public catalog after refresh.",
-        "Admin can delete a product and it no longer appears in the public catalog.",
-        "Categories can be created/edited and products can be assigned to categories (even if categories are not prominently displayed in the public UI yet)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/admin/AdminDashboardPage.tsx",
-          "operation": "create",
-          "description": "Create an admin dashboard landing page with links/tabs to Product Management, Category Management, and Order Management; keep the admin area visually distinct while aligned with the global design system."
-        },
-        {
-          "path": "frontend/src/pages/admin/AdminProductsPage.tsx",
-          "operation": "create",
-          "description": "Implement admin product list with create/edit/delete actions. Use backend capabilities for product CRUD (getAllProducts, updateProduct, deleteProduct) and refresh public data caches after mutations."
-        },
-        {
-          "path": "frontend/src/components/admin/ProductEditorDialog.tsx",
-          "operation": "create",
-          "description": "Create a reusable product editor (create/edit) UI collecting all required fields including category selection and bonus offer. Use shadcn-ui dialog/form primitives for consistent UX. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/admin/ProductPhotoUploader.tsx",
-          "operation": "create",
-          "description": "Implement photo upload UI for products using the selected blob-storage component: read file bytes, build ExternalBlob.fromBytes(...), optionally show upload progress, and pass the ExternalBlob reference to the backend updateProduct call. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/admin/AdminCategoriesPage.tsx",
-          "operation": "create",
-          "description": "Implement category management UI listing categories (getAllCategories) and allowing create/update flows using backend capabilities (addCategory and any provided update mechanism); ensure products can be assigned to categories during product editing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire admin product/category pages into admin routes and ensure they are all protected by AdminRouteGuard."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Cart and wholesale order/inquiry workflow: add to cart, adjust quantities, order summary, submit order, and view customer order history.",
-      "acceptanceCriteria": [
-        "Customer can add/remove products in a cart and adjust quantities.",
-        "Order summary clearly lists items, quantities, and the associated wholesale price/bonus information.",
-        "Submitting an order persists the order server-side and shows a confirmation state to the customer.",
-        "Customer order history page lists previously submitted orders and their basic details (date, items count, status/label)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/state/cartStore.ts",
-          "operation": "create",
-          "description": "Implement a cart state module with add/remove/update quantity and local persistence (e.g., localStorage) so cart survives login redirects and refreshes."
-        },
-        {
-          "path": "frontend/src/pages/CartPage.tsx",
-          "operation": "create",
-          "description": "Create cart page UI to review items, adjust quantities, and remove items. If user is unauthenticated, show a clear call-to-action to sign in and proceed."
-        },
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "create",
-          "description": "Create checkout/order summary page that requires customer authentication (use AuthGate) and submits the order via backend submitOrder using items derived from the cart; show a confirmation state on success and preserve cart until success."
-        },
-        {
-          "path": "frontend/src/pages/OrderHistoryPage.tsx",
-          "operation": "create",
-          "description": "Create order history page that requires customer authentication and fetches orders via backend getOrderHistory; display date, items count, and status/label."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire cart/checkout/order-history routes; ensure add-to-cart and checkout actions trigger the customer sign-in flow and return the user to the intended page without losing cart contents."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Admin order management inbox: list incoming orders newest-first and view order details in-app (no email).",
-      "acceptanceCriteria": [
-        "Admin can view a list of submitted orders sorted with newest first.",
-        "Admin can open an order to view customer identifier, submitted items, quantities, and submitted timestamp.",
-        "Newly submitted orders appear in the admin order list without requiring manual data entry."
+        "AdminOrdersPage shows customer/orderer info beyond the truncated principal (at minimum name and/or email when available; otherwise shows principal).",
+        "AdminOrderDetailPage includes a \"Customer Details\" section that displays: Name, Email, and Customer Principal.",
+        "If profile data is not available for an order, the UI displays \"Not provided\" (in English) for missing fields without crashing.",
+        "All customer/orderer details are only visible behind existing admin route protection (AdminRouteGuard / admin session)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/admin/AdminOrdersPage.tsx",
-          "operation": "create",
-          "description": "Implement admin orders inbox UI that fetches orders via backend getAllOrders and sorts newest-first in the UI; include refresh behavior after new submissions."
+          "operation": "modify",
+          "description": "Update the orders list to render customer/orderer details fetched via the new hook. Because hooks cannot be called inside a map, introduce a small per-row child component (defined in-file or imported) that accepts orderId and falls back to showing the order's customer principal while loading/error. Display name and/or email when available; otherwise show the principal (truncated). Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
-          "operation": "create",
-          "description": "Create an order detail view showing customer identifier (principal string representation), submitted items, quantities, and timestamp/status fields as available; optionally allow updating status via backend updateOrderStatus."
-        },
-        {
-          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire AdminOrdersPage and AdminOrderDetailPage into admin routes and protect them with AdminRouteGuard."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Site pages and layout: header with company name and navigation, About content, Contact info + form, and footer with © and disclaimer.",
-      "acceptanceCriteria": [
-        "Header displays the exact company name and the requested nav items, and navigation works on mobile and desktop.",
-        "About page contains sections for overview, mission & vision, and commitment to quality/compliance/ethical trade (English text).",
-        "Contact page displays: hitechpharmaceutical.pvt.ltd@gmail.com and +977 9761626880, and includes a working inquiry form UI with submit confirmation.",
-        "Footer includes “© Hi-Tech Pharmaceuticals Pvt. Ltd.” and the exact disclaimer: “For wholesale trade purposes only”."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/layout/SiteLayout.tsx",
-          "operation": "create",
-          "description": "Create a shared public layout with header (company name + nav Home | About Us | Products | Contact Us) and footer including “© Hi-Tech Pharmaceuticals Pvt. Ltd.” and disclaimer text exactly as specified."
-        },
-        {
-          "path": "frontend/src/pages/HomePage.tsx",
-          "operation": "create",
-          "description": "Create a Home page that introduces the wholesale catalog and provides clear navigation to Products; keep content aligned with the professional medical theme."
-        },
-        {
-          "path": "frontend/src/pages/AboutPage.tsx",
-          "operation": "create",
-          "description": "Create an About Us page with the required sections: overview, mission & vision, and commitment to quality/compliance/ethical trade (English text)."
-        },
-        {
-          "path": "frontend/src/pages/ContactPage.tsx",
-          "operation": "create",
-          "description": "Create a Contact page displaying hitechpharmaceutical.pvt.ltd@gmail.com and +977 9761626880 plus a contact form UI that shows submit confirmation (in-app)."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire SiteLayout and the Home/About/Products/Contact pages into routing so header navigation works across mobile/desktop."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Apply clean, modern hi-tech medical design (white/blue/light gray), professional styling, and full responsiveness across customer site and admin panel.",
-      "acceptanceCriteria": [
-        "Consistent typography, spacing, and component styling across pages using the specified color scheme.",
-        "All primary flows (browse products, filter A–Z, login, cart, order submit, admin CRUD) are usable on mobile widths without horizontal scrolling.",
-        "Admin panel is visually distinct as an admin area while still matching the overall design system."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Add global styles/design tokens for a white/blue/light gray medical theme (including typography, background/surface colors, and focus states) compatible with the existing Tailwind + shadcn-ui setup. Verify shadcn-ui theming expectations before implementing."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Adjust Tailwind theme extension variables (as needed) to support the requested palette and consistent spacing/typography across customer + admin UIs."
-        },
-        {
-          "path": "frontend/src/components/layout/AdminLayout.tsx",
-          "operation": "create",
-          "description": "Create an AdminLayout wrapper that visually distinguishes the admin area (e.g., sidebar/header styling) while keeping consistent typography and components with the public site."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Apply SiteLayout to public routes and AdminLayout to admin routes to ensure consistent, responsive styling across the entire app."
+          "description": "Add a \"Customer Details\" section that uses the new hook to fetch and display Name, Email, and Customer Principal for the selected order. Use clear \"Not provided\" fallbacks when profile or fields are missing, and keep the existing principal display consistent with backend-returned principal. Ensure errors (including unauthorized) do not crash the page. Verify the component's usage instructions before implementing."
         }
       ]
     }

@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '../../hooks/useQueries';
+import { useIsAdminSessionActive } from '../../hooks/useQueries';
 import { AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -10,11 +9,8 @@ interface AdminRouteGuardProps {
 }
 
 export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
-  const { identity, isInitializing } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isCheckingAdmin } = useIsCallerAdmin();
+  const { data: isSessionActive, isLoading } = useIsAdminSessionActive();
   const navigate = useNavigate();
-
-  const isLoading = isInitializing || isCheckingAdmin;
 
   if (isLoading) {
     return (
@@ -27,7 +23,7 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
     );
   }
 
-  if (!identity || !isAdmin) {
+  if (!isSessionActive) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/20">
         <div className="max-w-md w-full mx-4">

@@ -1,14 +1,14 @@
 {
   "frontend/src/index.css": "Global styles with medical-themed OKLCH color system (white/blue/light gray palette) for both light and dark modes, plus custom gradient utilities for medical and admin sections.",
   "frontend/src/App.tsx": "Main application component with single TanStack Router instance containing all public and admin routes, conditional layout rendering based on route path, theme provider, and toast notifications.",
-  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including products, categories, orders, user profiles, and admin functions with proper cache invalidation.",
+  "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including products, categories, orders, user profiles, admin functions with proper cache invalidation, admin session hooks, and new useGetOrderCustomerDetails hook for fetching customer/orderer details (principal and profile) for admin panel.",
   "frontend/src/hooks/useAuthGate.ts": "Custom hook that gates customer actions (add to cart, checkout) behind Internet Identity authentication and preserves intended actions post-login.",
   "frontend/src/state/cartStore.ts": "Zustand store for cart state management with localStorage persistence, supporting add/remove/update quantity operations.",
   "frontend/src/components/layout/SiteLayout.tsx": "Public site layout with responsive header, navigation, cart badge, login button, main content outlet, and footer; conditionally renders only for non-admin routes.",
-  "frontend/src/components/layout/AdminLayout.tsx": "Admin panel layout with distinct styling, navigation for dashboard/products/categories/orders, logout functionality, and admin route guard; conditionally renders only for admin routes.",
+  "frontend/src/components/layout/AdminLayout.tsx": "Admin panel layout with navigation, logout functionality using admin session state, and conditional rendering that bypasses guard/header for /admin/login route while protecting other admin routes.",
   "frontend/src/components/auth/CustomerLoginButton.tsx": "Customer authentication button using Internet Identity with loading states and proper error handling.",
   "frontend/src/components/auth/ProfileSetupDialog.tsx": "Modal dialog for first-time user profile creation (name and email) required before placing orders.",
-  "frontend/src/components/admin/AdminRouteGuard.tsx": "Route guard component that verifies admin authentication and role, showing access denied screen for unauthorized users.",
+  "frontend/src/components/admin/AdminRouteGuard.tsx": "Route guard component that verifies admin session status (via isAdminSessionActive query), shows loading state during verification, and displays access denied screen with login link for unauthorized users.",
   "frontend/src/components/products/AZFilter.tsx": "Alphabetical filter component (A-Z buttons) for product catalog with clear filter option.",
   "frontend/src/components/products/ProductCard.tsx": "Product card component displaying image, name, description, category, price, bonus offer, and add-to-cart button.",
   "frontend/src/components/admin/ProductEditorDialog.tsx": "Dialog form for creating and editing products with all fields (ID, name, description, price, category, bonus offer, photo upload).",
@@ -21,10 +21,11 @@
   "frontend/src/pages/CartPage.tsx": "Shopping cart page with item list, quantity adjustment, remove items, order summary, and checkout button (requires authentication).",
   "frontend/src/pages/CheckoutPage.tsx": "Checkout page for authenticated users showing order items, customer info, order summary, and submit order functionality with success confirmation.",
   "frontend/src/pages/OrderHistoryPage.tsx": "Customer order history page listing all submitted orders with status badges and item counts (authentication required).",
-  "frontend/src/pages/admin/AdminLoginPage.tsx": "Admin login page with Internet Identity authentication and automatic redirect to dashboard for authenticated admins.",
+  "frontend/src/pages/admin/AdminLoginPage.tsx": "Admin login page with email+password form that calls adminLogin backend method, displays inline error messages for invalid credentials, and redirects to /admin on successful authentication.",
   "frontend/src/pages/admin/AdminDashboardPage.tsx": "Admin dashboard with statistics cards for products, categories, and pending orders with navigation links.",
   "frontend/src/pages/admin/AdminProductsPage.tsx": "Admin product management page with table view, add/edit/delete actions, and confirmation dialogs.",
   "frontend/src/pages/admin/AdminCategoriesPage.tsx": "Admin category management page for creating and viewing product categories.",
-  "frontend/src/pages/admin/AdminOrdersPage.tsx": "Admin orders inbox listing all customer orders sorted newest-first with status badges and view details links.",
-  "frontend/src/pages/admin/AdminOrderDetailPage.tsx": "Admin order detail page showing customer principal, order items, quantities, and status update functionality."
+  "frontend/src/pages/admin/AdminOrdersPage.tsx": "Admin orders inbox listing all customer orders sorted newest-first with status badges, view details links, and OrderCustomerInfo component that displays customer name/email when available or falls back to principal.",
+  "frontend/src/pages/admin/AdminOrderDetailPage.tsx": "Admin order detail page showing customer details section (name, email, principal), order items, quantities, and status update functionality with proper loading states and \"Not provided\" fallbacks.",
+  "frontend/src/utils/adminSession.ts": "Utility functions for persisting and clearing non-sensitive admin session UI state (timestamp) in localStorage to support session hydration across page refreshes."
 }

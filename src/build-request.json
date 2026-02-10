@@ -1,228 +1,77 @@
 {
   "kind": "build_request",
-  "title": "Wholesale pharmaceutical website with public catalog, Google-based customer login for ordering, and separate admin panel",
+  "title": "Show customer/orderer details for each order in the admin panel",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Implement customer authentication that allows users to sign in with a Google account and require authentication only when placing an order (public browsing must not require login).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2",
-          "msg-3"
-        ],
-        "quotes": [
-          "Customer login via Gmail (Google Authentication)",
-          "no please use login with google"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Unauthenticated visitors can view the full product catalog and product detail information without being redirected to login.",
-        "Attempting to add to cart and/or submit an order triggers a sign-in flow.",
-        "After successful sign-in, the user is returned to the intended action (e.g., cart/checkout) without losing selected items.",
-        "The app stores a stable customer identifier to associate orders with the signed-in customer."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Create a dedicated, separate admin login flow using admin email + password and restrict all admin functionality to authenticated admins only.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Dedicated Admin Login Page",
-          "Login using Admin Email + Password"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin routes/pages are not accessible unless the user is authenticated as an admin.",
-        "Admin authentication is distinct from customer authentication and does not grant customer accounts admin capabilities.",
-        "An admin can log out and is then prevented from accessing admin pages until logging in again."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Build the public product catalog UI with alphabetical (A–Z) sorting and an A–Z letter filter, showing product name, image, dosage form, packing details, wholesale rate/price, and bonus scheme for each product.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Product list arranged alphabetically (A–Z)",
-          "Alphabet filter (A, B, C … Z)",
-          "Each product shows: Product name, Product image, Dosage form, Packing details, Wholesale rate/price, Bonus scheme"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Product list is sorted A–Z by product name by default.",
-        "Selecting a letter filter shows only products whose names begin with that letter; there is also an option to clear the filter.",
-        "Each product card/list row visibly includes all requested fields (name, image, dosage form, packing, price, bonus scheme).",
-        "UI is responsive and usable on mobile and desktop."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Implement product management in the admin panel: add, edit, delete products; upload/update product photos; set product rate/price; add/update bonus offers; and manage product categories.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Add new products",
-          "Edit products",
-          "Delete products",
-          "Upload / update product photos",
-          "Set product rate",
-          "Add / update bonus offers",
-          "Manage product list and categories"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can create a new product with all required fields and it appears in the public catalog.",
-        "Admin can update an existing product (including image) and changes reflect in the public catalog after refresh.",
-        "Admin can delete a product and it no longer appears in the public catalog.",
-        "Categories can be created/edited and products can be assigned to categories (even if categories are not prominently displayed in the public UI yet)."
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "text": "Implement a cart and wholesale order/inquiry workflow: authenticated customers can add products to cart, review an order summary, submit an order/inquiry, and view their order history.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Cart system for wholesale orders",
-          "Add products to cart",
-          "Review order summary",
-          "Submit wholesale order / inquiry",
-          "View order history"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Customer can add/remove products in a cart and adjust quantities.",
-        "Order summary clearly lists items, quantities, and the associated wholesale price/bonus information.",
-        "Submitting an order persists the order server-side and shows a confirmation state to the customer.",
-        "Customer order history page lists previously submitted orders and their basic details (date, items count, status/label)."
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "text": "Provide an admin-facing order management view that lists incoming orders/inquiries and their details, serving as the primary \"notification\" mechanism within the app.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Order notification sent to admin email",
-          "Manage ... Orders"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can view a list of submitted orders sorted with newest first.",
-        "Admin can open an order to view customer identifier, submitted items, quantities, and submitted timestamp.",
-        "Newly submitted orders appear in the admin order list without requiring manual data entry."
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "text": "Create site pages and layout: header with company name “Hi-Tech Pharmaceuticals Pvt. Ltd.” and navigation (Home | About Us | Products | Contact Us); About Us section content (overview, mission & vision, commitment); Contact page showing email and phone, plus a contact form; footer with © and disclaimer text.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Company name “Hi-Tech Pharmaceuticals Pvt. Ltd.” prominently at the top",
-          "Navigation menu: Home | About Us | Products | Contact Us",
-          "About Us Section",
-          "Contact Us Section",
-          "Footer",
-          "Disclaimer: “For wholesale trade purposes only”"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Header displays the exact company name and the requested nav items, and navigation works on mobile and desktop.",
-        "About page contains sections for overview, mission & vision, and commitment to quality/compliance/ethical trade (English text).",
-        "Contact page displays: hitechpharmaceutical.pvt.ltd@gmail.com and +977 9761626880, and includes a working inquiry form UI with submit confirmation.",
-        "Footer includes “© Hi-Tech Pharmaceuticals Pvt. Ltd.” and the exact disclaimer: “For wholesale trade purposes only”."
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Apply the requested clean, modern hi-tech medical design with a white/blue/light gray color scheme, professional/trustworthy styling, and full responsiveness across the customer site and admin panel.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-2"
-        ],
-        "quotes": [
-          "Clean, modern hi-tech medical design",
-          "White, blue, and light gray color scheme",
-          "Professional and trustworthy look",
-          "Fully responsive (desktop & mobile)"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Consistent typography, spacing, and component styling across pages using the specified color scheme.",
-        "All primary flows (browse products, filter A–Z, login, cart, order submit, admin CRUD) are usable on mobile widths without horizontal scrolling.",
-        "Admin panel is visually distinct as an admin area while still matching the overall design system."
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "text": "Backend data model and access control: persist products (including image references), categories, customers, and orders; enforce role-based access so public reads are allowed for products while product/order administration is admin-only and customer order history is customer-only.",
+      "id": "REQ-13",
+      "text": "Add an admin-session-protected backend query that returns the customer (orderer) details for a given order, including the customer Principal and the saved UserProfile (name, email) if available.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-2"
+          "msg-8"
         ],
         "quotes": [
-          "Database to manage: Products, Images, Prices & bonuses, Customers, Orders",
-          "Role-based access (Admin / Customer)",
-          "Secure authentication"
+          "1.please add function of showing custmber/orderer detail in admin panel"
         ]
       },
       "acceptanceCriteria": [
-        "Backend exposes query methods for public product listing and filtering inputs needed by the UI.",
-        "Backend exposes update methods for admin product/category management that reject non-admin callers.",
-        "Backend exposes customer order creation and order-history retrieval that restricts history to the caller’s customer identity.",
-        "All persisted entities remain available across canister upgrades per standard stable storage practices (migration only if/when needed)."
+        "When called by an authenticated admin session, the new query returns customer/orderer details for the specified order ID.",
+        "If the order ID does not exist, the backend returns a clear error (trap) consistent with existing patterns (e.g., \"Order does not exist\").",
+        "If the customer has not saved a user profile yet, the query still returns the customer Principal and indicates that the profile is missing (e.g., null/empty optional).",
+        "When called without an active admin session, the query is rejected with \"Unauthorized: Admin session required\" (or equivalent existing message)."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Update the admin orders data flow so the frontend can display customer/orderer details (name, email, and principal) in the admin panel orders list and order detail views using backend data (not hardcoded).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-8"
+        ],
+        "quotes": [
+          "1.please add function of showing custmber/orderer detail in admin panel"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The frontend has a React Query hook to fetch the customer/orderer details needed by the admin UI (either per-order or as part of an enriched admin orders query).",
+        "The implementation does not rely on AccessControl.isAdmin checks for admin panel access; it uses the existing admin session authorization model (requireAdminSession).",
+        "No changes are made to the customer login flow (Internet Identity) or to public browsing behavior."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Enhance the admin UI to show customer/orderer details for each order: (1) in the Admin Orders list, show customer name/email when available (fallback to showing the principal), and (2) in the Admin Order Detail page, show a dedicated \"Customer Details\" section with name, email, and principal (with clear \"Not provided\" fallbacks).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8"
+        ],
+        "quotes": [
+          "1.please add function of showing custmber/orderer detail in admin panel"
+        ]
+      },
+      "acceptanceCriteria": [
+        "AdminOrdersPage shows customer/orderer info beyond the truncated principal (at minimum name and/or email when available; otherwise shows principal).",
+        "AdminOrderDetailPage includes a \"Customer Details\" section that displays: Name, Email, and Customer Principal.",
+        "If profile data is not available for an order, the UI displays \"Not provided\" (in English) for missing fields without crashing.",
+        "All customer/orderer details are only visible behind existing admin route protection (AdminRouteGuard / admin session)."
       ]
     }
   ],
   "constraints": [
-    "Google OAuth \"Login with Google\" as a standalone third-party auth integration is not supported on this platform; authentication must use Internet Identity. If Google-based login is required, it must be achieved via Internet Identity’s supported sign-in options (which may include using a Google account depending on the user’s device/browser support).",
-    "Outbound email delivery (\"send notification to admin email\") via SMTP/SendGrid/Mailgun is not supported; implement in-app admin notifications/order inbox instead.",
-    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if an upgrade requires state migration.",
-    "Do not edit files under frontend/src/components/ui or other immutable paths listed in SYSTEM_CONTEXT; compose those components instead."
+    "Backend must remain a single Motoko actor in backend/main.mo; do not introduce additional backend services.",
+    "Do not edit any frontend files under frontend/src/components/ui (Shadcn components are read-only).",
+    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT (compose new hooks/utilities or update non-immutable files instead)."
   ],
   "nonGoals": [
-    "Payment gateway integration",
-    "GST invoice generation",
-    "Mobile app build",
-    "Real-time chat or WebSocket-based notifications",
-    "Third-party auth providers other than Internet Identity"
+    "Adding new customer profile fields beyond the existing name and email (e.g., address, phone) unless explicitly requested.",
+    "Adding email/SMS notifications for new orders.",
+    "Changing the order submission workflow, order ID generation, or existing status options beyond what is required to display customer details."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

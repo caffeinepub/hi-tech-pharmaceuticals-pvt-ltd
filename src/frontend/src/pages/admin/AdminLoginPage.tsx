@@ -1,32 +1,48 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useIsCallerAdmin } from '../../hooks/useQueries';
+import { useAdminLogin, useIsAdminSessionActive } from '../../hooks/useQueries';
+import { setAdminSessionUIState } from '../../utils/adminSession';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Shield, Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function AdminLoginPage() {
   const navigate = useNavigate();
-  const { login, identity, loginStatus } = useInternetIdentity();
-  const { data: isAdmin, isLoading: isCheckingAdmin } = useIsCallerAdmin();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const isAuthenticated = !!identity;
-  const isLoading = loginStatus === 'logging-in' || isCheckingAdmin;
+  const { data: isSessionActive, isLoading: isCheckingSession } = useIsAdminSessionActive();
+  const adminLogin = useAdminLogin();
 
   useEffect(() => {
-    if (isAuthenticated && isAdmin) {
+    if (isSessionActive) {
       navigate({ to: '/admin' });
     }
-  }, [isAuthenticated, isAdmin, navigate]);
+  }, [isSessionActive, navigate]);
 
-  const handleLogin = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!email || !password) {
+      setErrorMessage('Please enter both email and password');
+      return;
+    }
+
     try {
-      await login();
+      await adminLogin.mutateAsync({ email, password });
+      setAdminSessionUIState();
+      navigate({ to: '/admin' });
     } catch (error) {
-      console.error('Login error:', error);
+      setErrorMessage('Invalid email or password. Please try again.');
     }
   };
+
+  const isLoading = adminLogin.isPending || isCheckingSession;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/20">
@@ -36,19 +52,55 @@ export default function AdminLoginPage() {
             <Shield className="h-6 w-6 text-primary" />
           </div>
           <CardTitle className="text-2xl">Admin Login</CardTitle>
-          <CardDescription>Sign in with Internet Identity to access the admin panel</CardDescription>
+          <CardDescription>Sign in with your admin credentials to access the admin panel</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button className="w-full" size="lg" onClick={handleLogin} disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Signing in...
-              </>
-            ) : (
-              'Sign In with Internet Identity'
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {errorMessage && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
             )}
-          </Button>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                autoComplete="current-password"
+              />
+            </div>
+
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </Button>
+          </form>
+
           <p className="text-xs text-muted-foreground text-center mt-4">
             Only authorized administrators can access this area
           </p>

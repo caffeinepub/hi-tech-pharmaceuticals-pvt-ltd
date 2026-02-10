@@ -1,29 +1,43 @@
 import { Outlet, Link, useNavigate, useRouterState } from '@tanstack/react-router';
 import { Package, ShoppingBag, FolderTree, LogOut, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
-import { useIsCallerAdmin } from '../../hooks/useQueries';
+import { useAdminLogout, useIsAdminSessionActive } from '../../hooks/useQueries';
+import { clearAdminSessionUIState } from '../../utils/adminSession';
 import AdminRouteGuard from '../admin/AdminRouteGuard';
 
 export default function AdminLayout() {
-  const { clear, identity } = useInternetIdentity();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { data: isAdmin } = useIsCallerAdmin();
+  const { data: isSessionActive } = useIsAdminSessionActive();
+  const adminLogout = useAdminLogout();
   const routerState = useRouterState();
 
   // Only render admin layout for admin routes
   const isAdminRoute = routerState.location.pathname.startsWith('/admin');
+  const isLoginPage = routerState.location.pathname === '/admin/login';
   
   if (!isAdminRoute) {
     return <Outlet />;
   }
 
+  // Render login page without guard or header
+  if (isLoginPage) {
+    return <Outlet />;
+  }
+
   const handleLogout = async () => {
-    await clear();
-    queryClient.clear();
-    navigate({ to: '/admin/login' });
+    try {
+      await adminLogout.mutateAsync();
+      clearAdminSessionUIState();
+      queryClient.clear();
+      navigate({ to: '/admin/login' });
+    } catch (error) {
+      console.error('Logout error:', error);
+      clearAdminSessionUIState();
+      queryClient.clear();
+      navigate({ to: '/admin/login' });
+    }
   };
 
   const navItems = [
@@ -66,10 +80,10 @@ export default function AdminLayout() {
                 </nav>
               </div>
 
-              {identity && (
-                <Button variant="outline" size="sm" onClick={handleLogout}>
+              {isSessionActive && (
+                <Button variant="outline" size="sm" onClick={handleLogout} disabled={adminLogout.isPending}>
                   <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  {adminLogout.isPending ? 'Logging out...' : 'Logout'}
                 </Button>
               )}
             </div>

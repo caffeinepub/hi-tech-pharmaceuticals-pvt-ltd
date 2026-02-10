@@ -1,14 +1,16 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
+  "projectStateVersion": 7,
   "summary": "Professional, secure, scalable wholesale pharmaceutical website for Hi-Tech Pharmaceuticals Pvt. Ltd. with public A–Z product catalog, login required only for ordering using Google authentication, cart and wholesale order workflow, customer order history, and a separate secure admin panel for product/price/bonus/image management, plus About and Contact sections.",
   "architectural_notes": [
     "Authentication requirement: use Google login for customers; admin uses separate email+password login.",
     "Access model: public product browsing; authentication enforced only for cart checkout/order submission.",
-    "Separation of concerns: admin panel must be completely separate from customer/public views."
+    "Separation of concerns: admin panel must be completely separate from customer/public views.",
+    "Admin access depends on an existing admin account in the backend; initial admin user must be seeded/created (email+password) before /admin/login will work."
   ],
   "known_issues": [
-    "Potential platform constraint: Google/Gmail OAuth login may not be supported on the originally suggested Internet Computer/Internet Identity stack; may require alternative stack or custom OAuth integration."
+    "Potential platform constraint: Google/Gmail OAuth login may not be supported on the originally suggested Internet Computer/Internet Identity stack; may require alternative stack or custom OAuth integration.",
+    "Admin login may fail in deployed builds if no admin account has been created/seeded in the backend (credentials not recognized)."
   ],
   "isFixRequest": false,
   "existing_features": [
@@ -75,6 +77,38 @@
         "REQ-8"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-implement-a-dedicated-admin-email-password-login-flow-that-issues-and-validates-an-admin-session-for-subsequent-admin-requests-without-affecting-the-existing-customer-internet-identity-login-flow",
+      "title": "Implement a dedicated admin email+password login flow that issues and validates an admin session for subsequent admin requests, without affecting the existing customer Internet Identity login flow.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-admin-route-protection-to-rely-on-the-new-admin-session-auth-state-email-password-and-ensure-all-admin-routes-are-inaccessible-when-not-authenticated-as-an-admin",
+      "title": "Update admin route protection to rely on the new admin session/auth state (email+password) and ensure all /admin routes are inaccessible when not authenticated as an admin.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-orders-data-flow-so-the-frontend-can-display-customer-orderer-details-name-email-and-principal-in-the-admin-panel-orders-list-and-order-detail-views-using-backend-data-not-hardcoded",
+      "title": "Update the admin orders data flow so the frontend can display customer/orderer details (name, email, and principal) in the admin panel orders list and order detail views using backend data (not hardcoded).",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-the-admin-ui-to-show-customer-orderer-details-for-each-order-1-in-the-admin-orders-list-show-customer-name-email-when-available-fallback-to-showing-the-principal-and-2-in-the-admin-order-detail-page-show-a-dedicated-customer-details-section-with-name-email-and-principal-with-clear-not-provided-fallbacks",
+      "title": "Enhance the admin UI to show customer/orderer details for each order: (1) in the Admin Orders list, show customer name/email when available (fallback to showing the principal), and (2) in the Admin Order Detail page, show a dedicated \"Customer Details\" section with name, email, and principal (with clear \"Not provided\" fallbacks).",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -119,6 +153,28 @@
       "summary": "Backend data model and access control: persist products (including image references), categories, customers, and orders; enforce role-based access so public reads are allowed for products while product/order administration is admin-only and customer order history is customer-only.",
       "reqIds": [
         "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Create (seed) an initial admin account in the backend using the provided credentials so the user can log into the admin panel: email \"hitechpharmaceutical.pvt.ltd@gmail.com\" and password \"Nabin@7045\".",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Admin panel: show customer/orderer details for each order/inquiry (customer profile/contact and orderer information)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add an admin-session-protected backend query that returns the customer (orderer) details for a given order, including the customer Principal and the saved UserProfile (name, email) if available.",
+      "reqIds": [
+        "REQ-13"
       ],
       "status": "pending"
     }

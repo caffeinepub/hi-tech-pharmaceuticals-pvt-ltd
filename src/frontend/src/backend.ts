@@ -141,6 +141,8 @@ export interface backendInterface {
     _caffeineStorageUpdateGatewayPrincipals(): Promise<void>;
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addCategory(id: string, name: string): Promise<void>;
+    adminLogin(email: string, password: string): Promise<boolean>;
+    adminLogout(): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     deleteProduct(productId: string): Promise<void>;
     getAllCategories(): Promise<Array<Category>>;
@@ -148,10 +150,12 @@ export interface backendInterface {
     getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getOrderCustomerDetails(orderId: string): Promise<[Principal, UserProfile | null]>;
     getOrderHistory(): Promise<Array<Order>>;
     getProduct(productId: string): Promise<Product>;
     getProductsByCategory(categoryId: string): Promise<Array<Product>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isAdminSessionActive(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitOrder(items: Array<OrderItem>): Promise<void>;
@@ -273,6 +277,34 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async adminLogin(arg0: string, arg1: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminLogin(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminLogin(arg0, arg1);
+            return result;
+        }
+    }
+    async adminLogout(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.adminLogout();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.adminLogout();
+            return result;
+        }
+    }
     async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
         if (this.processError) {
             try {
@@ -371,6 +403,26 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n17(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getOrderCustomerDetails(arg0: string): Promise<[Principal, UserProfile | null]> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getOrderCustomerDetails(arg0);
+                return [
+                    result[0],
+                    from_candid_opt_n16(this._uploadFile, this._downloadFile, result[1])
+                ];
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getOrderCustomerDetails(arg0);
+            return [
+                result[0],
+                from_candid_opt_n16(this._uploadFile, this._downloadFile, result[1])
+            ];
+        }
+    }
     async getOrderHistory(): Promise<Array<Order>> {
         if (this.processError) {
             try {
@@ -425,6 +477,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getUserProfile(arg0);
             return from_candid_opt_n16(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isAdminSessionActive(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isAdminSessionActive();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isAdminSessionActive();
+            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {

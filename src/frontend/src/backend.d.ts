@@ -48,6 +48,8 @@ export enum UserRole {
 }
 export interface backendInterface {
     addCategory(id: string, name: string): Promise<void>;
+    adminLogin(email: string, password: string): Promise<boolean>;
+    adminLogout(): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     deleteProduct(productId: string): Promise<void>;
     getAllCategories(): Promise<Array<Category>>;
@@ -55,10 +57,12 @@ export interface backendInterface {
     getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getOrderCustomerDetails(orderId: string): Promise<[Principal, UserProfile | null]>;
     getOrderHistory(): Promise<Array<Order>>;
     getProduct(productId: string): Promise<Product>;
     getProductsByCategory(categoryId: string): Promise<Array<Product>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    isAdminSessionActive(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitOrder(items: Array<OrderItem>): Promise<void>;

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { Product, Category, Order, OrderItem, UserProfile } from '../backend';
 import { ExternalBlob } from '../backend';
+import type { Principal } from '@dfinity/principal';
 
 export function useGetAllProducts() {
   const { actor, isFetching } = useActor();
@@ -117,9 +118,14 @@ export function useGetAllOrders() {
     queryKey: ['adminOrders'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllOrders();
+      try {
+        return await actor.getAllOrders();
+      } catch {
+        return [];
+      }
     },
     enabled: !!actor && !isFetching,
+    retry: false,
   });
 }
 
@@ -214,5 +220,79 @@ export function useIsCallerAdmin() {
       }
     },
     enabled: !!actor && !isFetching,
+  });
+}
+
+// Admin session hooks
+export function useIsAdminSessionActive() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['adminSessionActive'],
+    queryFn: async () => {
+      if (!actor) return false;
+      try {
+        return await actor.isAdminSessionActive();
+      } catch {
+        return false;
+      }
+    },
+    enabled: !!actor && !isFetching,
+    retry: false,
+  });
+}
+
+export function useAdminLogin() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      const success = await actor.adminLogin(email, password);
+      if (!success) {
+        throw new Error('Invalid email or password');
+      }
+      return success;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['adminSessionActive'] });
+      queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
+    },
+    onError: () => {
+      queryClient.setQueryData(['adminSessionActive'], false);
+    },
+  });
+}
+
+export function useAdminLogout() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.adminLogout();
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['adminSessionActive'], false);
+      queryClient.invalidateQueries({ queryKey: ['adminOrders'] });
+    },
+  });
+}
+
+// Admin-only: Fetch customer details for a specific order
+export function useGetOrderCustomerDetails(orderId: string | undefined) {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<{ principal: Principal; profile: UserProfile | null }>({
+    queryKey: ['orderCustomerDetails', orderId],
+    queryFn: async () => {
+      if (!actor || !orderId) throw new Error('Actor or orderId not available');
+      const [principal, profile] = await actor.getOrderCustomerDetails(orderId);
+      return { principal, profile };
+    },
+    enabled: !!actor && !isFetching && !!orderId,
+    retry: false,
   });
 }
