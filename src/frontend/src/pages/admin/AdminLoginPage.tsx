@@ -33,8 +33,12 @@ export default function AdminLoginPage() {
       return;
     }
 
+    // Normalize credentials: trim whitespace and normalize email casing
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = password.trim();
+
     try {
-      await adminLogin.mutateAsync({ email, password });
+      await adminLogin.mutateAsync({ email: normalizedEmail, password: normalizedPassword });
       setAdminSessionUIState();
       navigate({ to: '/admin' });
     } catch (error) {

@@ -31,15 +31,20 @@ export interface Order {
 export interface UserProfile {
     name: string;
     email: string;
+    address?: string;
+    panNumber?: string;
+    phoneNumber?: string;
 }
 export interface Product {
     id: string;
+    mrp: bigint;
+    netRate: bigint;
     name: string;
     description: string;
     bonusOffer?: string;
     category: Category;
+    isHot: boolean;
     photo?: ExternalBlob;
-    price: bigint;
 }
 export enum UserRole {
     admin = "admin",
@@ -57,6 +62,7 @@ export interface backendInterface {
     getAllProducts(): Promise<Array<Product>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getHotProducts(): Promise<Array<Product>>;
     getOrderCustomerDetails(orderId: string): Promise<[Principal, UserProfile | null]>;
     getOrderHistory(): Promise<Array<Order>>;
     getProduct(productId: string): Promise<Product>;
@@ -64,8 +70,9 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isAdminSessionActive(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
+    markProductAsHot(productId: string, isHot: boolean): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     submitOrder(items: Array<OrderItem>): Promise<void>;
     updateOrderStatus(orderId: string, status: string): Promise<void>;
-    updateProduct(productId: string, name: string, description: string, price: bigint, photo: ExternalBlob | null, categoryId: string, bonusOffer: string | null): Promise<void>;
+    updateProduct(productId: string, name: string, description: string, netRate: bigint, mrp: bigint, photo: ExternalBlob | null, categoryId: string, bonusOffer: string | null, isHot: boolean): Promise<void>;
 }

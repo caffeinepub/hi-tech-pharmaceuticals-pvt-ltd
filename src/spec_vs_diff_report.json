@@ -1,29 +1,61 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T10:25:16.248Z",
-  "summary": "Diff implements a reusable QuantitySelector component, wires quantity selection into ProductCard (used on ProductsPage and HomePage) and ProductDetailPage, updates cartStore.addItem to accept an explicit quantity and accumulate quantities for existing items, and adds a HomePage “Hot Products” section derived from the existing products query. One acceptance criterion (removal of the old “Why Choose Us” grid) cannot be fully verified due to truncation of HomePage.tsx in the diff summary.",
+  "generatedAt": "2026-02-11T10:22:03.301Z",
+  "summary": "Diff implements the new backend schema (netRate/mrp/isHot on Product; optional phoneNumber/panNumber/address on UserProfile) with an upgrade migration module, updates ProfileSetupDialog to collect the new profile fields, updates HomePage to query/display only hot products with an empty state, updates ProductCard/ProductDetailPage to show Net Rate + MRP, and updates admin product editor/state to edit netRate/mrp and isHot.\n\nHowever, evidence is incomplete/truncated for some acceptance criteria (notably Checkout “Customer Information” rendering and full admin order customer details for PAN/address), and some cart/checkout calculations still appear to use a generic item.price field (not proven to be netRate everywhere).",
   "missing_requirements": [
     {
-      "id": "REQ-18",
-      "requirement": "HomePage no longer renders the “Why Choose Us” feature grid.",
-      "reason": "HomePage.tsx is truncated in the diff summary; while a “Hot Products” section is shown, the evidence does not conclusively show the old “Why Choose Us” section was removed.",
+      "id": "REQ-1",
+      "requirement": "Checkout page “Customer Information” displays phone number, PAN number, and address when present (and does not break if empty).",
+      "reason": "CheckoutPage diff excerpt shows authentication gating and totals calculation but the provided snippet does not show any “Customer Information” section rendering the new profile fields.",
       "evidence": [
-        "frontend/src/pages/HomePage.tsx (truncated)"
+        "frontend/src/pages/CheckoutPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-1",
+      "requirement": "Admin order-customer details view includes the new profile fields (phone number, PAN number, address) when present.",
+      "reason": "AdminOrderDetailPage excerpt shows name/email and a conditional phoneNumber block, but the diff is truncated before showing PAN number and address; cannot confirm they are included.",
+      "evidence": [
+        "frontend/src/pages/admin/AdminOrderDetailPage.tsx"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Cart and checkout totals continue to compute using the Net Rate price (not MRP).",
+      "reason": "CheckoutPage computes totals using `Number(item.price) * item.quantity`. While other pages add items with `price: product.netRate`, the diff excerpt does not prove cart items can never contain MRP or any legacy wholesale field, nor that all cart flows were updated consistently.",
+      "evidence": [
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/HomePage.tsx",
+        "frontend/src/pages/ProductsPage.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.72,
+  "hallucinated_features": [
+    {
+      "description": "Introduced emoji in user-facing UI for bonus offer badge (🎁).",
+      "reason": "BuildRequest requires English UI text and does not request adding emoji-based UI embellishments; this is extra behavior not specified.",
+      "evidence": [
+        "frontend/src/components/products/ProductCard.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/components/admin/ProductEditorDialog.tsx",
+    "frontend/src/components/auth/ProfileSetupDialog.tsx",
     "frontend/src/components/products/ProductCard.tsx",
-    "frontend/src/components/products/QuantitySelector.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/CheckoutPage.tsx",
     "frontend/src/pages/HomePage.tsx",
     "frontend/src/pages/ProductDetailPage.tsx",
     "frontend/src/pages/ProductsPage.tsx",
-    "frontend/src/state/cartStore.ts",
+    "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
+    "frontend/src/pages/admin/AdminProductsPage.tsx",
     "project_state.json"
   ]
 }

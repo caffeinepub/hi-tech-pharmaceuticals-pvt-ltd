@@ -1,136 +1,32 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
-  "summary": "Professional, secure, scalable wholesale pharmaceutical website for Hi-Tech Pharmaceuticals Pvt. Ltd. with public A–Z product catalog, login required only for ordering using Google authentication, cart and wholesale order workflow, customer order history, and a separate secure admin panel for product/price/bonus/image management, plus About and Contact sections.",
-  "architectural_notes": [
-    "Authentication requirement: use Google login for customers; admin uses separate email+password login.",
-    "Access model: public product browsing; authentication enforced only for cart checkout/order submission.",
-    "Separation of concerns: admin panel must be completely separate from customer/public views.",
-    "Admin access depends on an existing admin account in the backend; initial admin user must be seeded/created (email+password) before /admin/login will work."
-  ],
-  "known_issues": [
-    "Potential platform constraint: Google/Gmail OAuth login may not be supported on the originally suggested Internet Computer/Internet Identity stack; may require alternative stack or custom OAuth integration.",
-    "Admin login may fail in deployed builds if no admin account has been created/seeded in the backend (credentials not recognized)."
-  ],
+  "projectStateVersion": 3,
+  "summary": "App with customer login and product/admin management; adding extended customer profile fields, a 'hot products' section, and pricing label changes (wholesale -> net rate & MRP).",
+  "architectural_notes": [],
+  "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-implement-customer-authentication-that-allows-users-to-sign-in-with-a-google-account-and-require-authentication-only-when-placing-an-order-public-browsing-must-not-require-login",
-      "title": "Implement customer authentication that allows users to sign in with a Google account and require authentication only when placing an order (public browsing must not require login).",
+      "id": "feature-extend-the-customer-profile-data-model-to-store-phone-number-pan-number-and-address-and-update-all-related-read-write-backend-apis-and-frontend-profile-setup-flow-to-support-these-fields",
+      "title": "Extend the customer profile data model to store phone number, PAN number, and address, and update all related read/write backend APIs and frontend profile setup flow to support these fields.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-a-dedicated-separate-admin-login-flow-using-admin-email-password-and-restrict-all-admin-functionality-to-authenticated-admins-only",
-      "title": "Create a dedicated, separate admin login flow using admin email + password and restrict all admin functionality to authenticated admins only.",
+      "id": "feature-add-a-dedicated-admin-managed-hot-products-mechanism-so-admins-can-mark-unmark-products-as-hot-and-update-the-home-page-hot-products-section-to-display-only-the-admin-marked-hot-products-instead-of-selecting-the-first-4-products",
+      "title": "Add a dedicated admin-managed 'Hot Products' mechanism so admins can mark/unmark products as hot, and update the Home page Hot Products section to display only the admin-marked hot products (instead of selecting the first 4 products).",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-build-the-public-product-catalog-ui-with-alphabetical-a-z-sorting-and-an-a-z-letter-filter-showing-product-name-image-dosage-form-packing-details-wholesale-rate-price-and-bonus-scheme-for-each-product",
-      "title": "Build the public product catalog UI with alphabetical (A–Z) sorting and an A–Z letter filter, showing product name, image, dosage form, packing details, wholesale rate/price, and bonus scheme for each product.",
+      "id": "feature-replace-the-existing-wholesale-pricing-with-net-rate-and-add-a-separate-mrp-price-field-update-backend-product-data-admin-product-editor-inputs-and-all-customer-facing-displays-and-cart-order-calculations-to-use-net-rate-as-the-transactional-price-while-also-displaying-mrp-where-appropriate",
+      "title": "Replace the existing 'Wholesale' pricing with 'Net Rate' and add a separate 'MRP' price field; update backend product data, admin product editor inputs, and all customer-facing displays and cart/order calculations to use Net Rate as the transactional price while also displaying MRP where appropriate.",
       "reqIds": [
         "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-product-management-in-the-admin-panel-add-edit-delete-products-upload-update-product-photos-set-product-rate-price-add-update-bonus-offers-and-manage-product-categories",
-      "title": "Implement product management in the admin panel: add, edit, delete products; upload/update product photos; set product rate/price; add/update bonus offers; and manage product categories.",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-cart-and-wholesale-order-inquiry-workflow-authenticated-customers-can-add-products-to-cart-review-an-order-summary-submit-an-order-inquiry-and-view-their-order-history",
-      "title": "Implement a cart and wholesale order/inquiry workflow: authenticated customers can add products to cart, review an order summary, submit an order/inquiry, and view their order history.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-provide-an-admin-facing-order-management-view-that-lists-incoming-orders-inquiries-and-their-details-serving-as-the-primary-notification-mechanism-within-the-app",
-      "title": "Provide an admin-facing order management view that lists incoming orders/inquiries and their details, serving as the primary \"notification\" mechanism within the app.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-site-pages-and-layout-header-with-company-name-hi-tech-pharmaceuticals-pvt-ltd-and-navigation-home-about-us-products-contact-us-about-us-section-content-overview-mission-vision-commitment-contact-page-showing-email-and-phone-plus-a-contact-form-footer-with-and-disclaimer-text",
-      "title": "Create site pages and layout: header with company name “Hi-Tech Pharmaceuticals Pvt. Ltd.” and navigation (Home | About Us | Products | Contact Us); About Us section content (overview, mission & vision, commitment); Contact page showing email and phone, plus a contact form; footer with © and disclaimer text.",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-the-requested-clean-modern-hi-tech-medical-design-with-a-white-blue-light-gray-color-scheme-professional-trustworthy-styling-and-full-responsiveness-across-the-customer-site-and-admin-panel",
-      "title": "Apply the requested clean, modern hi-tech medical design with a white/blue/light gray color scheme, professional/trustworthy styling, and full responsiveness across the customer site and admin panel.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-dedicated-admin-email-password-login-flow-that-issues-and-validates-an-admin-session-for-subsequent-admin-requests-without-affecting-the-existing-customer-internet-identity-login-flow",
-      "title": "Implement a dedicated admin email+password login flow that issues and validates an admin session for subsequent admin requests, without affecting the existing customer Internet Identity login flow.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-admin-route-protection-to-rely-on-the-new-admin-session-auth-state-email-password-and-ensure-all-admin-routes-are-inaccessible-when-not-authenticated-as-an-admin",
-      "title": "Update admin route protection to rely on the new admin session/auth state (email+password) and ensure all /admin routes are inaccessible when not authenticated as an admin.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-admin-orders-data-flow-so-the-frontend-can-display-customer-orderer-details-name-email-and-principal-in-the-admin-panel-orders-list-and-order-detail-views-using-backend-data-not-hardcoded",
-      "title": "Update the admin orders data flow so the frontend can display customer/orderer details (name, email, and principal) in the admin panel orders list and order detail views using backend data (not hardcoded).",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-enhance-the-admin-ui-to-show-customer-orderer-details-for-each-order-1-in-the-admin-orders-list-show-customer-name-email-when-available-fallback-to-showing-the-principal-and-2-in-the-admin-order-detail-page-show-a-dedicated-customer-details-section-with-name-email-and-principal-with-clear-not-provided-fallbacks",
-      "title": "Enhance the admin UI to show customer/orderer details for each order: (1) in the Admin Orders list, show customer name/email when available (fallback to showing the principal), and (2) in the Admin Order Detail page, show a dedicated \"Customer Details\" section with name, email, and principal (with clear \"Not provided\" fallbacks).",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-quantity-selector-option-on-product-surfaces-so-customers-can-choose-a-quantity-before-adding-a-product-to-the-cart-including-on-the-products-listing-cards-and-the-product-detail-page",
-      "title": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-cart-state-api-to-support-adding-items-with-an-explicit-quantity-and-ensure-existing-add-to-cart-flows-use-the-new-quantity-aware-behavior-without-breaking-checkout-order-submission",
-      "title": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-home-page-why-choose-us-section-with-a-hot-products-section-that-displays-a-list-of-products-fetched-from-the-existing-products-query",
-      "title": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
-      "reqIds": [
-        "REQ-18"
       ],
       "version": 1
     }
@@ -138,85 +34,32 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Public product catalog with alphabetical (A–Z) listing and letter filter; each product shows name, image, dosage form, packing details, wholesale rate/price, and bonus scheme",
+      "summary": "Extend customer login/registration to collect phone number, PAN number, and address fields.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Order workflow with cart; browsing without login but Google login required to place orders; order summary + submit wholesale order/inquiry; customer order history",
+      "summary": "Add a separate section/compartment to manage and display 'hot products'.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Separate secure admin panel with dedicated admin login (email + password) to add/edit/delete products, upload/update photos, set rates, and manage bonus offers/categories",
+      "summary": "Update pricing fields/labels: change 'wholesale' to use/show 'net rate' and 'MRP'.",
       "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-4",
-      "summary": "Site pages and UI: responsive clean modern medical theme (white/blue/light gray), header nav (Home/About/Products/Contact), About Us content, Contact section with form and optional Google Map, footer with disclaimer",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Backend & database for products, images, prices/bonuses, customers, and orders with role-based access (admin/customer) plus admin email order notifications and scalability for future (mobile app, payment gateway, GST invoices)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Customer authentication via Google login (Gmail/Google Authentication)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Backend data model and access control: persist products (including image references), categories, customers, and orders; enforce role-based access so public reads are allowed for products while product/order administration is admin-only and customer order history is customer-only.",
+      "id": "AR-7",
+      "summary": "If the canister currently preserves state across upgrades, add/adjust conditional migration so existing stored products and user profiles are upgraded to the new schema (defaulting new fields safely) without losing data.",
       "reqIds": [
-        "REQ-9"
+        "REQ-4"
       ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Create (seed) an initial admin account in the backend using the provided credentials so the user can log into the admin panel: email \"hitechpharmaceutical.pvt.ltd@gmail.com\" and password \"Nabin@7045\".",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Admin panel: show customer/orderer details for each order/inquiry (customer profile/contact and orderer information)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-18",
-      "summary": "Add an admin-session-protected backend query that returns the customer (orderer) details for a given order, including the customer Principal and the saved UserProfile (name, email) if available.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-19",
-      "summary": "Add a quantity selector/option for products so customers can choose quantities (e.g., in product listing/details and/or when adding to cart)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-20",
-      "summary": "Homepage content update: replace the \"Why Choosing Us\" section with a \"Hot Product\" section that displays a list of products",
-      "reqIds": [],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Hi-Tech Pharmaceuticals Pvt. Ltd.",
+  "projectName": "Extend customer profile fields, add admin-managed Hot Products, and update pricing to Net Rate & MRP",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

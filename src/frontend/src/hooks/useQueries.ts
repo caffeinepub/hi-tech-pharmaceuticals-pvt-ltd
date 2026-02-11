@@ -17,6 +17,19 @@ export function useGetAllProducts() {
   });
 }
 
+export function useGetHotProducts() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<Product[]>({
+    queryKey: ['hotProducts'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.getHotProducts();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
 export function useGetProduct(productId: string) {
   const { actor, isFetching } = useActor();
 
@@ -168,25 +181,46 @@ export function useUpdateProduct() {
       productId,
       name,
       description,
-      price,
+      netRate,
+      mrp,
       photo,
       categoryId,
       bonusOffer,
+      isHot,
     }: {
       productId: string;
       name: string;
       description: string;
-      price: bigint;
+      netRate: bigint;
+      mrp: bigint;
       photo: ExternalBlob | null;
       categoryId: string;
       bonusOffer: string | null;
+      isHot: boolean;
     }) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.updateProduct(productId, name, description, price, photo, categoryId, bonusOffer);
+      return actor.updateProduct(productId, name, description, netRate, mrp, photo, categoryId, bonusOffer, isHot);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ['hotProducts'] });
+    },
+  });
+}
+
+export function useMarkProductAsHot() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ productId, isHot }: { productId: string; isHot: boolean }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.markProductAsHot(productId, isHot);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['hotProducts'] });
     },
   });
 }
@@ -202,6 +236,7 @@ export function useDeleteProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['hotProducts'] });
     },
   });
 }

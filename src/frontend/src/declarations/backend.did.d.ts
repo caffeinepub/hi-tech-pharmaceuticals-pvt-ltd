@@ -21,14 +21,22 @@ export interface Order {
 export interface OrderItem { 'productId' : string, 'quantity' : bigint }
 export interface Product {
   'id' : string,
+  'mrp' : bigint,
+  'netRate' : bigint,
   'name' : string,
   'description' : string,
   'bonusOffer' : [] | [string],
   'category' : Category,
+  'isHot' : boolean,
   'photo' : [] | [ExternalBlob],
-  'price' : bigint,
 }
-export interface UserProfile { 'name' : string, 'email' : string }
+export interface UserProfile {
+  'name' : string,
+  'email' : string,
+  'address' : [] | [string],
+  'panNumber' : [] | [string],
+  'phoneNumber' : [] | [string],
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -70,6 +78,7 @@ export interface _SERVICE {
   'getAllProducts' : ActorMethod<[], Array<Product>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getHotProducts' : ActorMethod<[], Array<Product>>,
   'getOrderCustomerDetails' : ActorMethod<
     [string],
     [Principal, [] | [UserProfile]]
@@ -80,6 +89,7 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isAdminSessionActive' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'markProductAsHot' : ActorMethod<[string, boolean], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'submitOrder' : ActorMethod<[Array<OrderItem>], undefined>,
   'updateOrderStatus' : ActorMethod<[string, string], undefined>,
@@ -89,9 +99,11 @@ export interface _SERVICE {
       string,
       string,
       bigint,
+      bigint,
       [] | [ExternalBlob],
       string,
       [] | [string],
+      boolean,
     ],
     undefined
   >,

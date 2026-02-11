@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Let shoppers select a quantity before adding products to the cart, and update the Home page to feature a “Hot Products” product list instead of the “Why Choose Us” section.
+**Goal:** Extend customer profiles with additional fields, let admins manage which products are “Hot Products”, and update product pricing to use Net Rate + MRP across admin and customer flows.
 
 **Planned changes:**
-- Add a quantity control (default 1) to product surfaces on the Products listing cards and the Product Detail page, validating to an integer ≥ 1 and using the selected quantity when adding to cart.
-- Update the cart store add-item API to accept an explicit quantity and to increment existing cart line quantities by the added amount, without breaking checkout/order submission.
-- Replace the Home page “Why Choose Us” section with a “Hot Products” section that fetches products via existing hooks, renders a product list/grid, links to product details, and provides a “View All Products” path with loading/empty states.
+- Extend the customer profile data model to include phone number, PAN number, and address; update related backend APIs and the frontend profile setup flow to read/write these fields safely for existing users.
+- Update customer-facing and admin order-customer views to display the new profile fields when present without breaking when empty.
+- Add a persisted “Hot Product” flag to products; update the admin product editor to mark/unmark products as hot and update the Home page Hot Products section to display only hot-marked products with an English empty state when none are set.
+- Replace “Wholesale” pricing with “Net Rate” and add “MRP”; update backend product data, admin product editor inputs, product listing/detail displays, and cart/checkout/order calculations to use Net Rate as the transactional price while also showing MRP where appropriate.
+- If applicable, add/adjust backend migration so existing stored products and user profiles are upgraded to the new schema with safe defaults and without data loss.
 
-**User-visible outcome:** Customers can choose how many items to add to the cart from product cards and product details, and the Home page shows a “Hot Products” product list instead of the prior feature grid.
+**User-visible outcome:** Customers can save and see phone number, PAN number, and address in their profile and during checkout; admins can choose which products appear in the Hot Products section; pricing throughout the app shows Net Rate and MRP, and totals are calculated using Net Rate.

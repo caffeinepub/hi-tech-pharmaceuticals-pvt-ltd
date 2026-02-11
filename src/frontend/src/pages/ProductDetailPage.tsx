@@ -26,7 +26,7 @@ export default function ProductDetailPage() {
         {
           productId: product.id,
           productName: product.name,
-          price: product.price,
+          price: product.netRate,
         },
         quantity
       );
@@ -55,7 +55,8 @@ export default function ProductDetailPage() {
   }
 
   const imageUrl = product.photo?.getDirectURL();
-  const priceDisplay = Number(product.price).toLocaleString();
+  const netRateDisplay = Number(product.netRate).toLocaleString();
+  const mrpDisplay = Number(product.mrp).toLocaleString();
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -90,8 +91,13 @@ export default function ProductDetailPage() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Wholesale Price</p>
-                  <p className="text-4xl font-bold text-primary">NPR {priceDisplay}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Net Rate</p>
+                  <p className="text-4xl font-bold text-primary">NPR {netRateDisplay}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">MRP</p>
+                  <p className="text-2xl font-semibold">NPR {mrpDisplay}</p>
                 </div>
 
                 {product.bonusOffer && (

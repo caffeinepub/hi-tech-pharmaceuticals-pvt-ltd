@@ -136,6 +136,24 @@ export default function CheckoutPage() {
                       <p className="text-sm text-muted-foreground">Email</p>
                       <p className="font-medium">{userProfile.email}</p>
                     </div>
+                    {userProfile.phoneNumber && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Phone Number</p>
+                        <p className="font-medium">{userProfile.phoneNumber}</p>
+                      </div>
+                    )}
+                    {userProfile.panNumber && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">PAN Number</p>
+                        <p className="font-medium">{userProfile.panNumber}</p>
+                      </div>
+                    )}
+                    {userProfile.address && (
+                      <div>
+                        <p className="text-sm text-muted-foreground">Address</p>
+                        <p className="font-medium">{userProfile.address}</p>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

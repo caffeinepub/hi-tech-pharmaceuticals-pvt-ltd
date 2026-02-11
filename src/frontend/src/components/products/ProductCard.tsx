@@ -15,7 +15,8 @@ interface ProductCardProps {
 export default function ProductCard({ product, onAddToCart }: ProductCardProps) {
   const [quantity, setQuantity] = useState(1);
   const imageUrl = product.photo?.getDirectURL();
-  const priceDisplay = Number(product.price).toLocaleString();
+  const netRateDisplay = Number(product.netRate).toLocaleString();
+  const mrpDisplay = Number(product.mrp).toLocaleString();
 
   const handleAddToCart = () => {
     onAddToCart(product, quantity);
@@ -44,10 +45,15 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         <div className="flex items-center justify-between mb-2">
           <Badge variant="secondary">{product.category.name}</Badge>
         </div>
-        <div className="flex items-baseline justify-between">
-          <div>
-            <span className="text-2xl font-bold text-primary">NPR {priceDisplay}</span>
-            <span className="text-xs text-muted-foreground ml-1">wholesale</span>
+        <div className="space-y-1">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <span className="text-2xl font-bold text-primary">NPR {netRateDisplay}</span>
+              <span className="text-xs text-muted-foreground ml-1">Net Rate</span>
+            </div>
+          </div>
+          <div className="flex items-baseline">
+            <span className="text-sm text-muted-foreground">MRP: NPR {mrpDisplay}</span>
           </div>
         </div>
         {product.bonusOffer && (

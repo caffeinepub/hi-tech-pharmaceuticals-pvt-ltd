@@ -1,74 +1,99 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-10T10:25:16.252Z",
+  "generatedAt": "2026-02-11T10:22:03.304Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 4,
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-16",
-        "summary": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
+        "id": "REQ-1",
+        "summary": "Extend the customer profile data model to store phone number, PAN number, and address, and update all related read/write backend APIs and frontend profile setup flow to support these fields.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/products/QuantitySelector.tsx",
-          "frontend/src/components/products/ProductCard.tsx",
-          "frontend/src/pages/ProductsPage.tsx",
-          "frontend/src/pages/ProductDetailPage.tsx"
+          "frontend/src/components/auth/ProfileSetupDialog.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/pages/admin/AdminOrderDetailPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/products/QuantitySelector.tsx",
-          "frontend/src/components/products/ProductCard.tsx",
-          "frontend/src/pages/ProductsPage.tsx",
-          "frontend/src/pages/ProductDetailPage.tsx"
+          "frontend/src/components/auth/ProfileSetupDialog.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/pages/admin/AdminOrderDetailPage.tsx"
         ]
       },
       {
-        "id": "REQ-17",
-        "summary": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
+        "id": "REQ-2",
+        "summary": "Add a dedicated admin-managed 'Hot Products' mechanism so admins can mark/unmark products as hot, and update the Home page Hot Products section to display only the admin-marked hot products (instead of selecting the first 4 products).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/state/cartStore.ts",
-          "frontend/src/pages/ProductsPage.tsx",
-          "frontend/src/pages/ProductDetailPage.tsx",
-          "frontend/src/pages/CheckoutPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/pages/HomePage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/state/cartStore.ts",
-          "frontend/src/pages/ProductsPage.tsx",
-          "frontend/src/pages/ProductDetailPage.tsx",
-          "frontend/src/pages/CheckoutPage.tsx"
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/pages/HomePage.tsx"
         ]
       },
       {
-        "id": "REQ-18",
-        "summary": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
+        "id": "REQ-3",
+        "summary": "Replace the existing 'Wholesale' pricing with 'Net Rate' and add a separate 'MRP' price field; update backend product data, admin product editor inputs, and all customer-facing displays and cart/order calculations to use Net Rate as the transactional price while also displaying MRP where appropriate.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/pages/admin/AdminProductsPage.tsx",
+          "frontend/src/components/products/ProductCard.tsx",
+          "frontend/src/pages/ProductDetailPage.tsx",
+          "frontend/src/pages/CartPage.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
           "frontend/src/pages/HomePage.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/admin/ProductEditorDialog.tsx",
+          "frontend/src/pages/admin/AdminProductsPage.tsx",
+          "frontend/src/components/products/ProductCard.tsx",
+          "frontend/src/pages/ProductDetailPage.tsx",
+          "frontend/src/pages/CheckoutPage.tsx",
           "frontend/src/pages/HomePage.tsx"
         ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "If the canister currently preserves state across upgrades, add/adjust conditional migration so existing stored products and user profiles are upgraded to the new schema (defaulting new fields safely) without losing data.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/admin/ProductEditorDialog.tsx",
+    "frontend/src/components/auth/ProfileSetupDialog.tsx",
     "frontend/src/components/products/ProductCard.tsx",
-    "frontend/src/components/products/QuantitySelector.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/CheckoutPage.tsx",
     "frontend/src/pages/HomePage.tsx",
     "frontend/src/pages/ProductDetailPage.tsx",
     "frontend/src/pages/ProductsPage.tsx",
-    "frontend/src/state/cartStore.ts",
+    "frontend/src/pages/admin/AdminOrderDetailPage.tsx",
+    "frontend/src/pages/admin/AdminProductsPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

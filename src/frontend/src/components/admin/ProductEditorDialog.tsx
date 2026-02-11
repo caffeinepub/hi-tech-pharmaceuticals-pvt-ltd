@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { useUpdateProduct, useGetAllCategories } from '../../hooks/useQueries';
 import type { Product } from '../../backend';
@@ -21,10 +22,12 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
   const [productId, setProductId] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [netRate, setNetRate] = useState('');
+  const [mrp, setMrp] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [bonusOffer, setBonusOffer] = useState('');
   const [photo, setPhoto] = useState<ExternalBlob | null>(null);
+  const [isHot, setIsHot] = useState(false);
 
   const { data: categories = [] } = useGetAllCategories();
   const updateProduct = useUpdateProduct();
@@ -34,18 +37,22 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
       setProductId(product.id);
       setName(product.name);
       setDescription(product.description);
-      setPrice(product.price.toString());
+      setNetRate(product.netRate.toString());
+      setMrp(product.mrp.toString());
       setCategoryId(product.category.id);
       setBonusOffer(product.bonusOffer || '');
       setPhoto(product.photo || null);
+      setIsHot(product.isHot);
     } else {
       setProductId('');
       setName('');
       setDescription('');
-      setPrice('');
+      setNetRate('');
+      setMrp('');
       setCategoryId('');
       setBonusOffer('');
       setPhoto(null);
+      setIsHot(false);
     }
   }, [product, open]);
 
@@ -62,10 +69,12 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
         productId: productId.trim(),
         name: name.trim(),
         description: description.trim(),
-        price: BigInt(price || '0'),
+        netRate: BigInt(netRate || '0'),
+        mrp: BigInt(mrp || '0'),
         photo,
         categoryId,
         bonusOffer: bonusOffer.trim() || null,
+        isHot,
       });
       toast.success(product ? 'Product updated successfully!' : 'Product created successfully!');
       onOpenChange(false);
@@ -118,32 +127,44 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Wholesale Price (NPR) *</Label>
+              <Label htmlFor="netRate">Net Rate (NPR) *</Label>
               <Input
-                id="price"
+                id="netRate"
                 type="number"
                 placeholder="0"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={netRate}
+                onChange={(e) => setNetRate(e.target.value)}
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">Category *</Label>
-              <Select value={categoryId} onValueChange={setCategoryId} required>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="mrp">MRP (NPR) *</Label>
+              <Input
+                id="mrp"
+                type="number"
+                placeholder="0"
+                value={mrp}
+                onChange={(e) => setMrp(e.target.value)}
+                required
+              />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="category">Category *</Label>
+            <Select value={categoryId} onValueChange={setCategoryId} required>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
@@ -153,6 +174,20 @@ export default function ProductEditorDialog({ open, onOpenChange, product }: Pro
               placeholder="e.g., Buy 10 Get 1 Free"
               value={bonusOffer}
               onChange={(e) => setBonusOffer(e.target.value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="space-y-0.5">
+              <Label htmlFor="isHot">Hot Product</Label>
+              <p className="text-sm text-muted-foreground">
+                Mark this product as a hot/featured product
+              </p>
+            </div>
+            <Switch
+              id="isHot"
+              checked={isHot}
+              onCheckedChange={setIsHot}
             />
           </div>
 

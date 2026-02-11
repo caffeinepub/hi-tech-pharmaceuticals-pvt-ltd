@@ -86,6 +86,24 @@ export default function AdminOrderDetailPage() {
                       <p className="text-xs text-muted-foreground">Email</p>
                       <p className="font-medium">{customerDetails.profile?.email || 'Not provided'}</p>
                     </div>
+                    {customerDetails.profile?.phoneNumber && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Phone Number</p>
+                        <p className="font-medium">{customerDetails.profile.phoneNumber}</p>
+                      </div>
+                    )}
+                    {customerDetails.profile?.panNumber && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">PAN Number</p>
+                        <p className="font-medium">{customerDetails.profile.panNumber}</p>
+                      </div>
+                    )}
+                    {customerDetails.profile?.address && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Address</p>
+                        <p className="font-medium">{customerDetails.profile.address}</p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-xs text-muted-foreground">Customer Principal</p>
                       <p className="font-mono text-xs break-all">{customerDetails.principal.toString()}</p>

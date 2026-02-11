@@ -3,12 +3,17 @@ import List "mo:core/List";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import Array "mo:core/Array";
 import Text "mo:core/Text";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
+import Migration "migration";
+import VarArray "mo:core/VarArray";
 
+// Enable state migration on upgrades
+(with migration = Migration.run)
 actor {
   type Category = {
     id : Text;
@@ -19,15 +24,21 @@ actor {
     id : Text;
     name : Text;
     description : Text;
-    price : Nat;
+    netRate : Nat;
+    mrp : Nat;
     photo : ?Storage.ExternalBlob;
     category : Category;
     bonusOffer : ?Text;
+    isHot : Bool;
   };
 
+  // Extended UserProfile with address fields
   type UserProfile = {
     name : Text;
     email : Text;
+    phoneNumber : ?Text;
+    panNumber : ?Text;
+    address : ?Text;
   };
 
   type OrderItem = {
@@ -56,59 +67,32 @@ actor {
   let orders = Map.empty<Text, Order>();
   let userProfiles = Map.empty<Principal, UserProfile>();
 
-  var adminCredentials : ?AdminCredentials = ?{
+  let adminCredentials : AdminCredentials = {
     email = "hitechpharmaceutical.pvt.ltd@gmail.com";
     password = "Nabin@7045";
   };
 
-  // Map of Principal -> admin session active status
-  let adminSessions = Map.empty<Principal, Bool>();
+  let adminPrincipals = Map.empty<Principal, Bool>();
 
-  // Admin authentication
+  // Admin authentication - assigns admin role upon successful login
   public shared ({ caller }) func adminLogin(email : Text, password : Text) : async Bool {
-    switch (adminCredentials) {
-      case (null) { return false };
-      case (?creds) {
-        if (creds.email == email and creds.password == password) {
-          adminSessions.add(caller, true);
-          return true;
-        };
-      };
+    if (adminCredentials.email == email and adminCredentials.password == password) {
+      AccessControl.assignRole(accessControlState, caller, caller, #admin);
+      adminPrincipals.add(caller, true);
+      return true;
     };
     false;
   };
 
   public query ({ caller }) func isAdminSessionActive() : async Bool {
-    switch (adminSessions.get(caller)) {
-      case (null) { false };
-      case (?active) { active };
-    };
+    AccessControl.isAdmin(accessControlState, caller);
   };
 
   public shared ({ caller }) func adminLogout() : async () {
-    adminSessions.remove(caller);
-  };
-
-  // Helper to check admin session for the specific caller
-  func requireAdminSession(caller : Principal) {
-    switch (adminSessions.get(caller)) {
-      case (null) {
-        Runtime.trap("Unauthorized: Admin session required");
-      };
-      case (?active) {
-        if (not active) {
-          Runtime.trap("Unauthorized: Admin session required");
-        };
-      };
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can logout");
     };
-  };
-
-  // Helper to check if caller has an active admin session
-  func hasAdminSession(caller : Principal) : Bool {
-    switch (adminSessions.get(caller)) {
-      case (null) { false };
-      case (?active) { active };
-    };
+    adminPrincipals.remove(caller);
   };
 
   // User profile management
@@ -120,7 +104,7 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller) and not hasAdminSession(caller)) {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
@@ -133,7 +117,37 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Public browsing - no authentication required
+  public shared ({ caller }) func markProductAsHot(productId : Text, isHot : Bool) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can mark products as hot");
+    };
+    switch (products.get(productId)) {
+      case (null) {};
+      case (?p) {
+        products.add(
+          productId,
+          {
+            id = p.id;
+            name = p.name;
+            description = p.description;
+            netRate = p.netRate;
+            mrp = p.mrp;
+            photo = p.photo;
+            category = p.category;
+            bonusOffer = p.bonusOffer;
+            isHot;
+          },
+        );
+      };
+    };
+  };
+
+  // Get all hot products
+  public query ({ caller }) func getHotProducts() : async [Product] {
+    products.values().toArray().filter(func(p) { p.isHot });
+  };
+
+  // Product browsing
   public query ({ caller }) func getAllCategories() : async [Category] {
     categories.values().toArray();
   };
@@ -159,7 +173,7 @@ actor {
     categoryProducts.toArray();
   };
 
-  // Customer order functions - user authentication required
+  // Customer order functions
   public query ({ caller }) func getOrderHistory() : async [Order] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view order history");
@@ -187,14 +201,18 @@ actor {
     orders.add(orderId, order);
   };
 
-  // Admin functions - admin session authentication required
+  // Admin functions
   public query ({ caller }) func getAllOrders() : async [Order] {
-    requireAdminSession(caller);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view all orders");
+    };
     orders.values().toArray();
   };
 
   public shared ({ caller }) func addCategory(id : Text, name : Text) : async () {
-    requireAdminSession(caller);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add categories");
+    };
     let category : Category = {
       id;
       name;
@@ -202,8 +220,10 @@ actor {
     categories.add(id, category);
   };
 
-  public shared ({ caller }) func updateProduct(productId : Text, name : Text, description : Text, price : Nat, photo : ?Storage.ExternalBlob, categoryId : Text, bonusOffer : ?Text) : async () {
-    requireAdminSession(caller);
+  public shared ({ caller }) func updateProduct(productId : Text, name : Text, description : Text, netRate : Nat, mrp : Nat, photo : ?Storage.ExternalBlob, categoryId : Text, bonusOffer : ?Text, isHot : Bool) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update products");
+    };
     let category = switch (categories.get(categoryId)) {
       case (null) { Runtime.trap("Category does not exist") };
       case (?category) { category };
@@ -212,21 +232,27 @@ actor {
       id = productId;
       name;
       description;
-      price;
+      netRate;
+      mrp;
       photo;
       category;
       bonusOffer;
+      isHot;
     };
     products.add(productId, product);
   };
 
   public shared ({ caller }) func deleteProduct(productId : Text) : async () {
-    requireAdminSession(caller);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can delete products");
+    };
     products.remove(productId);
   };
 
   public shared ({ caller }) func updateOrderStatus(orderId : Text, status : Text) : async () {
-    requireAdminSession(caller);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update order status");
+    };
     let order = switch (orders.get(orderId)) {
       case (null) { Runtime.trap("Order does not exist") };
       case (?order) { order };
@@ -240,9 +266,10 @@ actor {
     orders.add(orderId, updatedOrder);
   };
 
-  // Admin-only order customer details fetch
   public query ({ caller }) func getOrderCustomerDetails(orderId : Text) : async (Principal, ?UserProfile) {
-    requireAdminSession(caller);
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view customer details");
+    };
 
     let order = switch (orders.get(orderId)) {
       case (null) { Runtime.trap("Order does not exist") };

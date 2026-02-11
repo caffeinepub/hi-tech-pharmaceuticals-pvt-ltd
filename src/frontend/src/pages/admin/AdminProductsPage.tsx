@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import ProductEditorDialog from '../../components/admin/ProductEditorDialog';
 import type { Product } from '../../backend';
@@ -89,7 +89,9 @@ export default function AdminProductsPage() {
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
+                  <TableHead>Net Rate</TableHead>
+                  <TableHead>MRP</TableHead>
+                  <TableHead>Hot</TableHead>
                   <TableHead>Bonus</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -102,7 +104,16 @@ export default function AdminProductsPage() {
                     <TableCell>
                       <Badge variant="secondary">{product.category.name}</Badge>
                     </TableCell>
-                    <TableCell>NPR {Number(product.price).toLocaleString()}</TableCell>
+                    <TableCell>NPR {Number(product.netRate).toLocaleString()}</TableCell>
+                    <TableCell>NPR {Number(product.mrp).toLocaleString()}</TableCell>
+                    <TableCell>
+                      {product.isHot && (
+                        <Badge variant="destructive" className="gap-1">
+                          <Flame className="h-3 w-3" />
+                          Hot
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {product.bonusOffer || '-'}
                     </TableCell>
@@ -133,16 +144,14 @@ export default function AdminProductsPage() {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Product</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this product? This action cannot be undone.
+              This action cannot be undone. This will permanently delete the product from the catalog.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

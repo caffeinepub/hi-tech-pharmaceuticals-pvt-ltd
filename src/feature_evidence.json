@@ -2,36 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-quantity-selector-option-on-product-surfaces-so-customers-can-choose-a-quantity-before-adding-a-product-to-the-cart-including-on-the-products-listing-cards-and-the-product-detail-page",
-      "featureTitle": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
+      "featureId": "feature-extend-the-customer-profile-data-model-to-store-phone-number-pan-number-and-address-and-update-all-related-read-write-backend-apis-and-frontend-profile-setup-flow-to-support-these-fields",
+      "featureTitle": "Extend the customer profile data model to store phone number, PAN number, and address, and update all related read/write backend APIs and frontend profile setup flow to support these fields.",
       "files": [
-        "frontend/src/components/products/ProductCard.tsx",
-        "frontend/src/components/products/QuantitySelector.tsx",
-        "frontend/src/pages/ProductDetailPage.tsx",
-        "frontend/src/pages/ProductsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-16"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-the-cart-state-api-to-support-adding-items-with-an-explicit-quantity-and-ensure-existing-add-to-cart-flows-use-the-new-quantity-aware-behavior-without-breaking-checkout-order-submission",
-      "featureTitle": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
-      "files": [
+        "frontend/src/components/auth/ProfileSetupDialog.tsx",
         "frontend/src/pages/CheckoutPage.tsx",
-        "frontend/src/pages/ProductDetailPage.tsx",
-        "frontend/src/pages/ProductsPage.tsx",
-        "frontend/src/state/cartStore.ts"
+        "frontend/src/pages/admin/AdminOrderDetailPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -43,14 +19,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-17"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-replace-the-home-page-why-choose-us-section-with-a-hot-products-section-that-displays-a-list-of-products-fetched-from-the-existing-products-query",
-      "featureTitle": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
+      "featureId": "feature-add-a-dedicated-admin-managed-hot-products-mechanism-so-admins-can-mark-unmark-products-as-hot-and-update-the-home-page-hot-products-section-to-display-only-the-admin-marked-hot-products-instead-of-selecting-the-first-4-products",
+      "featureTitle": "Add a dedicated admin-managed 'Hot Products' mechanism so admins can mark/unmark products as hot, and update the Home page Hot Products section to display only the admin-marked hot products (instead of selecting the first 4 products).",
       "files": [
+        "frontend/src/components/admin/ProductEditorDialog.tsx",
+        "frontend/src/hooks/useQueries.ts",
         "frontend/src/pages/HomePage.tsx"
       ],
       "components": [
@@ -63,7 +41,33 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-18"
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-replace-the-existing-wholesale-pricing-with-net-rate-and-add-a-separate-mrp-price-field-update-backend-product-data-admin-product-editor-inputs-and-all-customer-facing-displays-and-cart-order-calculations-to-use-net-rate-as-the-transactional-price-while-also-displaying-mrp-where-appropriate",
+      "featureTitle": "Replace the existing 'Wholesale' pricing with 'Net Rate' and add a separate 'MRP' price field; update backend product data, admin product editor inputs, and all customer-facing displays and cart/order calculations to use Net Rate as the transactional price while also displaying MRP where appropriate.",
+      "files": [
+        "frontend/src/components/admin/ProductEditorDialog.tsx",
+        "frontend/src/components/products/ProductCard.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/CheckoutPage.tsx",
+        "frontend/src/pages/HomePage.tsx",
+        "frontend/src/pages/ProductDetailPage.tsx",
+        "frontend/src/pages/admin/AdminProductsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

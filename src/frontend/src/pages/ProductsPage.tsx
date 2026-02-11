@@ -42,7 +42,7 @@ export default function ProductsPage() {
         {
           productId: product.id,
           productName: product.name,
-          price: product.price,
+          price: product.netRate,
         },
         quantity
       );
@@ -67,7 +67,7 @@ export default function ProductsPage() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Our Products</h1>
           <p className="text-muted-foreground">
-            Browse our complete catalog of wholesale pharmaceutical products
+            Browse our complete catalog of pharmaceutical products
           </p>
         </div>
 

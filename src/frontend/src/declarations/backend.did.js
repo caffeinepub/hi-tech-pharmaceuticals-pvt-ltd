@@ -38,16 +38,21 @@ export const Order = IDL.Record({
 export const ExternalBlob = IDL.Vec(IDL.Nat8);
 export const Product = IDL.Record({
   'id' : IDL.Text,
+  'mrp' : IDL.Nat,
+  'netRate' : IDL.Nat,
   'name' : IDL.Text,
   'description' : IDL.Text,
   'bonusOffer' : IDL.Opt(IDL.Text),
   'category' : Category,
+  'isHot' : IDL.Bool,
   'photo' : IDL.Opt(ExternalBlob),
-  'price' : IDL.Nat,
 });
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'email' : IDL.Text,
+  'address' : IDL.Opt(IDL.Text),
+  'panNumber' : IDL.Opt(IDL.Text),
+  'phoneNumber' : IDL.Opt(IDL.Text),
 });
 
 export const idlService = IDL.Service({
@@ -88,6 +93,7 @@ export const idlService = IDL.Service({
   'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getHotProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getOrderCustomerDetails' : IDL.Func(
       [IDL.Text],
       [IDL.Principal, IDL.Opt(UserProfile)],
@@ -103,6 +109,7 @@ export const idlService = IDL.Service({
     ),
   'isAdminSessionActive' : IDL.Func([], [IDL.Bool], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'markProductAsHot' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'submitOrder' : IDL.Func([IDL.Vec(OrderItem)], [], []),
   'updateOrderStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
@@ -112,9 +119,11 @@ export const idlService = IDL.Service({
         IDL.Text,
         IDL.Text,
         IDL.Nat,
+        IDL.Nat,
         IDL.Opt(ExternalBlob),
         IDL.Text,
         IDL.Opt(IDL.Text),
+        IDL.Bool,
       ],
       [],
       [],
@@ -154,14 +163,22 @@ export const idlFactory = ({ IDL }) => {
   const ExternalBlob = IDL.Vec(IDL.Nat8);
   const Product = IDL.Record({
     'id' : IDL.Text,
+    'mrp' : IDL.Nat,
+    'netRate' : IDL.Nat,
     'name' : IDL.Text,
     'description' : IDL.Text,
     'bonusOffer' : IDL.Opt(IDL.Text),
     'category' : Category,
+    'isHot' : IDL.Bool,
     'photo' : IDL.Opt(ExternalBlob),
-    'price' : IDL.Nat,
   });
-  const UserProfile = IDL.Record({ 'name' : IDL.Text, 'email' : IDL.Text });
+  const UserProfile = IDL.Record({
+    'name' : IDL.Text,
+    'email' : IDL.Text,
+    'address' : IDL.Opt(IDL.Text),
+    'panNumber' : IDL.Opt(IDL.Text),
+    'phoneNumber' : IDL.Opt(IDL.Text),
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -201,6 +218,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getHotProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getOrderCustomerDetails' : IDL.Func(
         [IDL.Text],
         [IDL.Principal, IDL.Opt(UserProfile)],
@@ -220,6 +238,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'isAdminSessionActive' : IDL.Func([], [IDL.Bool], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'markProductAsHot' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'submitOrder' : IDL.Func([IDL.Vec(OrderItem)], [], []),
     'updateOrderStatus' : IDL.Func([IDL.Text, IDL.Text], [], []),
@@ -229,9 +248,11 @@ export const idlFactory = ({ IDL }) => {
           IDL.Text,
           IDL.Text,
           IDL.Nat,
+          IDL.Nat,
           IDL.Opt(ExternalBlob),
           IDL.Text,
           IDL.Opt(IDL.Text),
+          IDL.Bool,
         ],
         [],
         [],

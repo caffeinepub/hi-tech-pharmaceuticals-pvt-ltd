@@ -1,89 +1,99 @@
 {
   "kind": "build_request",
-  "title": "Add product quantity selector and replace Home \"Why Choose Us\" with \"Hot Products\" list",
+  "title": "Extend customer profile fields, add admin-managed Hot Products, and update pricing to Net Rate & MRP",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-16",
-      "text": "Add a quantity selector option on product surfaces so customers can choose a quantity before adding a product to the cart, including on the Products listing cards and the Product Detail page.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Extend the customer profile data model to store phone number, PAN number, and address, and update all related read/write backend APIs and frontend profile setup flow to support these fields.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "2. aslo add quantity option in product"
+          "can make some other function like  in login( customer ) also keep option of phone number , pan no. , and adress also"
         ]
       },
       "acceptanceCriteria": [
-        "On ProductsPage, each ProductCard provides a quantity control (e.g., stepper or numeric input) with a default quantity of 1.",
-        "On ProductDetailPage, the page provides a quantity control with a default quantity of 1.",
-        "Clicking “Add to Cart” uses the selected quantity (not always +1).",
-        "Quantity is validated client-side to be an integer >= 1; invalid values are prevented or corrected to 1.",
-        "The existing cart page quantity controls continue to work as-is for adjusting quantities after items are in the cart."
+        "Backend `UserProfile` includes fields for phone number, PAN number, and address (in addition to existing name/email).",
+        "Existing customers who already created a profile can still load their profile without errors after the update (missing fields handled safely).",
+        "`ProfileSetupDialog` prompts for Full Name, Email Address, Phone Number, PAN Number, and Address (English labels), and saves them via the existing save profile mutation.",
+        "Checkout page “Customer Information” displays the new fields when present (and does not break if they are empty).",
+        "Admin order-customer details view (used in admin order detail) includes the new profile fields when present."
       ]
     },
     {
-      "id": "REQ-17",
-      "text": "Update the cart state API to support adding items with an explicit quantity, and ensure existing add-to-cart flows use the new quantity-aware behavior without breaking checkout/order submission.",
-      "target": "frontend",
+      "id": "REQ-2",
+      "text": "Add a dedicated admin-managed 'Hot Products' mechanism so admins can mark/unmark products as hot, and update the Home page Hot Products section to display only the admin-marked hot products (instead of selecting the first 4 products).",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "2. aslo add quantity option in product"
+          "and aslo keep sepeate compatment for keeeping hot product"
         ]
       },
       "acceptanceCriteria": [
-        "The cart store addItem action supports specifying a quantity when adding a product.",
-        "If a product already exists in the cart, adding with quantity N increases its quantity by N (rather than always +1).",
-        "Checkout submission still sends the final cart quantities to the backend unchanged (i.e., quantities reflect the selected quantity plus any later cart edits).",
-        "No TypeScript errors remain in pages/components that call addItem (e.g., ProductsPage, ProductDetailPage)."
+        "Backend product model supports a persisted hot/featured flag for each product.",
+        "Admin product editor UI includes a clear control (e.g., checkbox/switch) to set whether a product is a Hot Product.",
+        "Home page Hot Products section renders products that are marked hot; it no longer uses `products.slice(0, 4)` selection logic.",
+        "If no products are marked hot, the Home page Hot Products section shows an appropriate empty state message (in English) and does not crash."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Replace the Home page “Why Choose Us” section with a “Hot Products” section that displays a list of products fetched from the existing products query.",
-      "target": "frontend",
+      "id": "REQ-3",
+      "text": "Replace the existing 'Wholesale' pricing with 'Net Rate' and add a separate 'MRP' price field; update backend product data, admin product editor inputs, and all customer-facing displays and cart/order calculations to use Net Rate as the transactional price while also displaying MRP where appropriate.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1"
         ],
         "quotes": [
-          "3. also replace the part of why choosing us to hot product and keep list of product list there"
+          "also change in  wholesle into net rate and mrp"
         ]
       },
       "acceptanceCriteria": [
-        "HomePage no longer renders the “Why Choose Us” feature grid.",
-        "HomePage renders a section titled “Hot Products”.",
-        "The “Hot Products” section fetches products using the existing frontend data hooks and renders a product list/grid (reusing existing product UI where practical).",
-        "Each listed product links to its Product Detail page and provides a clear path to view all products (e.g., a “View All Products” link/button).",
-        "If products are still loading or empty, the section shows an appropriate loading/empty state message in English."
+        "Backend product model supports two numeric prices: Net Rate and MRP.",
+        "Admin product editor shows two numeric inputs labeled 'Net Rate (NPR)' and 'MRP (NPR)' (replacing 'Wholesale Price (NPR)').",
+        "ProductCard replaces the 'wholesale' label with 'Net Rate' and shows MRP as a secondary value (formatting is consistent and readable).",
+        "Product detail page replaces 'Wholesale Price' with 'Net Rate' and also shows MRP.",
+        "Cart and checkout totals continue to compute using the Net Rate price (not MRP).",
+        "Any remaining user-facing text that says 'Wholesale' in the pricing context is updated to 'Net Rate' (English)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "If the canister currently preserves state across upgrades, add/adjust conditional migration so existing stored products and user profiles are upgraded to the new schema (defaulting new fields safely) without losing data.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "pan no. , and adress also  and aslo keep sepeate compatment for keeeping hot product, also change in  wholesle into net rate and mrp"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Migration (only if applicable per project migration policy) converts existing `UserProfile` records to include the new fields with safe defaults.",
+        "Migration (only if applicable) converts existing products so Net Rate is initialized from the previous single price field and MRP is initialized to a safe default (and hot flag defaults to false).",
+        "After upgrade, existing products and profiles can still be fetched via existing queries without runtime traps."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui (compose these components instead).",
-    "Backend must remain a single Motoko actor in backend/main.mo; only add migration.mo if a stable state upgrade is required (not expected for these UI/cart changes)."
+    "Backend must remain a single Motoko actor in `backend/main.mo` (no additional backend services).",
+    "Do not edit files under `frontend/src/components/ui` or any other frontend immutable paths listed in SYSTEM_CONTEXT.",
+    "Use English for all user-facing UI text."
   ],
   "nonGoals": [
-    "Do not change the backend Product, Order, or OrderItem schema.",
-    "Do not implement a new admin feature for marking products as “hot” (the Home “Hot Products” list can be derived from existing product data, e.g., showing a subset).",
-    "Do not add third-party services, analytics, or external databases."
+    "Add third-party authentication providers (only Internet Identity is supported).",
+    "Add real-time/websocket features.",
+    "Add external database integrations."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }
